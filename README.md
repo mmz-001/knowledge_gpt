@@ -6,24 +6,26 @@ Accurate answers and instant citations for your documents.
 
 ## 🔧 Features
 
-- Upload documents (PDF, DOCX, TXT) and answer questions about them.
-- Cite sources for the answers, with excerpts from the text.
+- Upload documents 📁(PDF, DOCX, TXT) and answer questions about them.
+- Cite sources📚 for the answers, with excerpts from the text.
 
 ## 💻 Running Locally
 
-1. Clone the repository.
+1. Clone the repository📂
 
 ```bash
 git clone https://github.com/mmz-001/knowledge_gpt
+cd knowledge_gpt
 ```
 
-2. Install dependencies with [Poetry](https://python-poetry.org/).
+2. Install dependencies with [Poetry](https://python-poetry.org/) and activate virtual environment🔨
 
 ```bash
 poetry install
+poetry shell
 ```
 
-3. Run the Streamlit server.
+3. Run the Streamlit server🚀
 
 ```bash
 cd knowledge_gpt
