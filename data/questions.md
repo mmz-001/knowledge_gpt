@@ -20,9 +20,10 @@ These are some questions you can ask from the example data to test KnowlegeGPT.
 1. What is the value of my stock options and when can I exercise them?
 2. What insurance options are available to me?
 3. Are there any mandatory arbitration clauses included in the contract?
-4. What termination benefits am I entitled to?
-5. What is the vacation policy?
-6. What is the salary and bonus structure?
+4. Are there any mandatory arbitration clauses included in this contract?
+5. What termination benefits am I entitled to?
+6. What is the vacation policy?
+7. What is the salary and bonus structure?
 
 ## HyDE Paper
 
