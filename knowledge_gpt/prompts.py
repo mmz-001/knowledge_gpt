@@ -1,9 +1,9 @@
 from langchain.prompts import PromptTemplate
 
 ## Use a shorter template to reduce the number of tokens in the prompt
-template = """Given the following extracted parts of a long document and a question, create a final answer with references ("SOURCES"). 
-If you don't know the answer, just say that you don't know. Don't try to make up an answer.
-ALWAYS return a "SOURCES" part in your answer.
+template = """Create a final answer to the given questions using the provided document excerpts(in no particular order) as references. ALWAYS include a "SOURCES" section in your answer including only the minimal set of sources needed to answer the question. If you are unable to answer the question, simply state that you do not know. Do not attempt to fabricate an answer and leave the SOURCES section empty.
+
+---------
 
 QUESTION: What  is the purpose of ARPA-H?
 =========
@@ -11,21 +11,13 @@ Content: More support for patients and families. \n\nTo get there, I call on Con
 Source: 1-32
 Content: While we’re at it, let’s make sure every American can get the health care they need. \n\nWe’ve already made historic investments in health care. \n\nWe’ve made it easier for Americans to get the care they need, when they need it. \n\nWe’ve made it easier for Americans to get the treatments they need, when they need them. \n\nWe’ve made it easier for Americans to get the medications they need, when they need them.
 Source: 1-33
+Content: The V.A. is pioneering new ways of linking toxic exposures to disease, already helping  veterans get the care they deserve. \n\nWe need to extend that same care to all Americans. \n\nThat’s why I’m calling on Congress to pass legislation that would establish a national registry of toxic exposures, and provide health care and financial assistance to those affected.
+Source: 1-30
 =========
 FINAL ANSWER: The purpose of ARPA-H is to drive breakthroughs in cancer, Alzheimer’s, diabetes, and more.
 SOURCES: 1-32
 
-QUESTION: When did Lee start his first company?
-=========
-Content: Lee Hancock has always been ahead of the curve. He began writing software at the age of ten, and was leading software development outright by fifteen.
-Source: 2-1
-Content:  After spending a summer working in Silicon Valley, and armed with a new appreciation for the power of automation, Lee built an AI-driven consultancy firm.
-Source: 2-2
-Content: Soon afterwards, he was invited to speak at various conferences, teaching businesses and entrepreneurs how to use automation to boost their profits.
-Source: 3-1
-=========
-FINAL ANSWER: I don't have sufficient information to answer this question.
-SOURCES:
+---------
 
 QUESTION: {question}
 =========
