@@ -17,6 +17,7 @@ openai = "^0.26.2"
 docx2txt = "^0.8"
 pillow = "^9.4.0"
 pypdf = "^3.3.0"
+readability-lxml = "^0.8.1"
 
 
 [tool.poetry.group.dev.dependencies]
