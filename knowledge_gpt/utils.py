@@ -7,6 +7,8 @@ from langchain.llms import OpenAI
 from langchain.docstore.document import Document
 from langchain.vectorstores import FAISS, VectorStore
 import docx2txt
+import requests
+from readability import Document as ReadabilityDocument
 from typing import List, Dict, Any
 import re
 from io import BytesIO
@@ -146,3 +148,21 @@ def wrap_text_in_html(text: str | List[str]) -> str:
         # Add horizontal rules between pages
         text = "\n<hr/>\n".join(text)
     return "".join([f"<p>{line}</p>" for line in text.split("\n")])
+
+@st.experimental_memo()
+def parse_url(url: str) -> str:
+    """Parses a URL and returns the text content"""
+    try:
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        doc = ReadabilityDocument(response.text)
+        text = doc.summary(html_partial=True)
+        text = re.sub(r"<[^>]*>", "", text)
+        # Stripe multiple newlines, big spaces, and tabs
+        text = re.sub(r"\n\s*\n", "\n\n", text)
+        text = re.sub(r"\s{3,}", " ", text)
+        # text = re.sub(r"\t", "", text)
+        return text
+    except requests.exceptions.HTTPError as error:
+        st.error(f"Error on fetch page: {error}")
+        return ""

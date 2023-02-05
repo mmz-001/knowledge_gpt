@@ -9,6 +9,7 @@ from utils import (
     get_answer,
     get_sources,
     wrap_text_in_html,
+    parse_url
 )
 from openai.error import OpenAIError
 
@@ -65,6 +66,22 @@ uploaded_file = st.file_uploader(
 
 index = None
 doc = None
+web_url = st.text_input("Or enter a url", placeholder="https://...")
+web_button = st.button("Add page to index!")
+if web_button and web_url:
+    if not web_url.startswith("http"):
+        st.error("Please enter a valid url!")
+    else:
+        doc = parse_url(web_url)
+        text = text_to_docs(doc)
+        try:
+            index = embed_docs(text)
+            st.session_state["api_key_configured"] = True
+            print('Added page to index!', index)
+        except OpenAIError as err:
+            st.error(err._message)
+            print('Index error', err._message)
+
 if uploaded_file is not None:
     if uploaded_file.name.endswith(".pdf"):
         doc = parse_pdf(uploaded_file)
