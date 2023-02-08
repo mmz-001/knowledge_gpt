@@ -2,7 +2,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores.faiss import FAISS
 from langchain import OpenAI, Cohere
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
-from langchain.embeddings import CohereEmbeddings, OpenAIEmbeddings
+from embeddings import OpenAIEmbeddings
 from langchain.llms import OpenAI
 from langchain.docstore.document import Document
 from langchain.vectorstores import FAISS, VectorStore
@@ -83,7 +83,7 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
     return doc_chunks
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True, show_spinner=False)
 def embed_docs(docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index"""
 
