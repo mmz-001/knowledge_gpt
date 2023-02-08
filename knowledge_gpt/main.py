@@ -76,7 +76,8 @@ if uploaded_file is not None:
         raise ValueError("File type not supported!")
     text = text_to_docs(doc)
     try:
-        index = embed_docs(text)
+        with st.spinner("Indexing document... This may take a while⏳"):
+            index = embed_docs(text)
         st.session_state["api_key_configured"] = True
     except OpenAIError as e:
         st.error(e._message)

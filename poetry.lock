@@ -628,14 +628,14 @@ format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-
 
 [[package]]
 name = "langchain"
-version = "0.0.71"
+version = "0.0.79"
 description = "Building applications with LLMs through composability"
 category = "main"
 optional = false
 python-versions = ">=3.8.1,<4.0"
 files = [
-    {file = "langchain-0.0.71-py3-none-any.whl", hash = "sha256:da74c9825986a75ccce41beb495acd21fb5a36a7b2e5b7438c16ea7649dd2379"},
-    {file = "langchain-0.0.71.tar.gz", hash = "sha256:8b0107ac4ffb2556556ac308cdab6d9d1a43d00b7805913cb9f8c6dbc0bc0fd0"},
+    {file = "langchain-0.0.79-py3-none-any.whl", hash = "sha256:26bf5ec3ef077610ff82103b0abb823784b950bc9a28da2fdaaf9915802b5d4a"},
+    {file = "langchain-0.0.79.tar.gz", hash = "sha256:54bdeeed739cfb31934733221ad8afbf10c13330bdd2741812a902dbd0a7c221"},
 ]
 
 [package.dependencies]
@@ -645,9 +645,10 @@ pydantic = ">=1,<2"
 PyYAML = ">=6,<7"
 requests = ">=2,<3"
 SQLAlchemy = ">=1,<2"
+tenacity = ">=8.1.0,<9.0.0"
 
 [package.extras]
-all = ["beautifulsoup4 (>=4,<5)", "elasticsearch (>=8,<9)", "faiss-cpu (>=1,<2)", "google-api-python-client (==2.70.0)", "jinja2 (>=3,<4)", "manifest-ml (>=0.0.1,<0.0.2)", "nltk (>=3,<4)", "pinecone-client (>=2,<3)", "qdrant-client (>=0.11.7,<0.12.0)", "redis (>=4,<5)", "spacy (>=3,<4)", "tiktoken (>=0,<1)", "torch (>=1,<2)", "transformers (>=4,<5)", "weaviate-client (>=3,<4)", "wikipedia (>=1,<2)", "wolframalpha (==5.0.0)"]
+all = ["beautifulsoup4 (>=4,<5)", "elasticsearch (>=8,<9)", "faiss-cpu (>=1,<2)", "google-api-python-client (==2.70.0)", "jinja2 (>=3,<4)", "manifest-ml (>=0.0.1,<0.0.2)", "nltk (>=3,<4)", "pinecone-client (>=2,<3)", "qdrant-client (>=0.11.7,<0.12.0)", "redis (>=4,<5)", "spacy (>=3,<4)", "tensorflow-text (>=2.11.0,<3.0.0)", "tiktoken (>=0,<1)", "torch (>=1,<2)", "transformers (>=4,<5)", "weaviate-client (>=3,<4)", "wikipedia (>=1,<2)", "wolframalpha (==5.0.0)"]
 llms = ["manifest-ml (>=0.0.1,<0.0.2)", "torch (>=1,<2)", "transformers (>=4,<5)"]
 
 [[package]]
@@ -1685,6 +1686,21 @@ watchdog = {version = "*", markers = "platform_system != \"Darwin\""}
 snowflake = ["snowflake-snowpark-python"]
 
 [[package]]
+name = "tenacity"
+version = "8.2.0"
+description = "Retry code until it succeeds"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "tenacity-8.2.0-py3-none-any.whl", hash = "sha256:b723061a78ed0f4524190eae321d3d84100227d51c5677035b6615d91895e0d6"},
+    {file = "tenacity-8.2.0.tar.gz", hash = "sha256:a43bcd8910406e0884ca0db3db7bed581f389c1d05165e992a1ddabfc81df05e"},
+]
+
+[package.extras]
+doc = ["reno", "sphinx", "tornado (>=4.5)"]
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -2004,4 +2020,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "646db27d1b8e4002e7808bcc0a08368b566201901af4ba14dcd25063caf78424"
+content-hash = "22dbb20a81ec4fb277f35f71bcbc75e11d4b8bfcfaf364edadc4fd2036c50400"
