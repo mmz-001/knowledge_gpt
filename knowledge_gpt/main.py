@@ -1,17 +1,17 @@
 import streamlit as st
 from components.sidebar import sidebar
+from openai.error import OpenAIError
 from utils import (
+    embed_docs,
+    get_answer,
+    get_sources,
     parse_docx,
     parse_pdf,
     parse_txt,
     search_docs,
-    embed_docs,
     text_to_docs,
-    get_answer,
-    get_sources,
     wrap_text_in_html,
 )
-from openai.error import OpenAIError
 
 
 def clear_submit():

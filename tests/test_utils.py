@@ -1,5 +1,6 @@
-from knowledge_gpt.utils import get_sources
 from langchain.docstore.document import Document
+
+from knowledge_gpt.utils import get_sources
 
 
 def test_get_sources():

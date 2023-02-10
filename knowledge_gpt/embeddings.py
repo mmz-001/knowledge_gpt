@@ -1,18 +1,16 @@
 """Wrapper around OpenAI embedding models."""
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Extra, root_validator
-
 from langchain.embeddings.base import Embeddings
 from langchain.utils import get_from_dict_or_env
-
+from openai.error import APIConnectionError, APIError, RateLimitError, Timeout
+from pydantic import BaseModel, Extra, root_validator
 from tenacity import (
     retry,
     retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
 )
-from openai.error import Timeout, APIError, APIConnectionError, RateLimitError
 
 
 class OpenAIEmbeddings(BaseModel, Embeddings):
