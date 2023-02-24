@@ -95,7 +95,7 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
         """Call out to OpenAI's embedding
         endpoint with exponential backoff."""
         # replace newlines, which can 
-        #negatively affect performance.
+        # negatively affect performance.
         text = text.replace("\n", " ")
         return self.client.create(input=[text],
                                   engine=engine)["data"][0]["embedding"]
