@@ -1,30 +1,23 @@
 import re
 from io import BytesIO
 from typing import Any, Dict, List
-
 import docx2txt
 import streamlit as st
 from embeddings import OpenAIEmbeddings
-
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from langchain.docstore.document import Document
 from langchain.llms import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import VectorStore
-
 from openai.error import AuthenticationError
 from prompts import STUFF_PROMPT
 from pypdf import PdfReader
-
-
 @st.experimental_memo()
 def parse_docx(file: BytesIO) -> str:
     text = docx2txt.process(file)
     # Remove multiple newlines
     text = re.sub(r"\n\s*\n", "\n\n", text)
     return text
-
-
 @st.experimental_memo()
 def parse_pdf(file: BytesIO) -> List[str]:
     pdf = PdfReader(file)
@@ -37,7 +30,6 @@ def parse_pdf(file: BytesIO) -> List[str]:
         text = re.sub(r"(?<!\n\s)\n(?!\s\n)", " ", text.strip())
         # Remove multiple newlines
         text = re.sub(r"\n\s*\n", "\n\n", text)
-
         output.append(text)
 
     return output
@@ -53,7 +45,8 @@ def parse_txt(file: BytesIO) -> str:
 
 @st.cache(allow_output_mutation=True)
 def text_to_docs(text: str | List[str]) -> List[Document]:
-    """Converts a string or list of strings to a list of Documents
+    """Converts a string or list 
+    of strings to a list of Documents
     with metadata."""
     if isinstance(text, str):
         # Take a single string as one page
@@ -80,7 +73,8 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
                 metadata={"page": doc.metadata["page"], "chunk": i}
             )
             
-            doc.metadata["source"] = f"{doc.metadata['page']}-{doc.metadata['chunk']}"
+            doc.metadata["source"] = 
+            f"{doc.metadata['page']}-{doc.metadata['chunk']}"
             doc_chunks.append(doc)
     return doc_chunks
 
@@ -90,12 +84,12 @@ def embed_docs(docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index"""
 
     if not st.session_state.get("OPENAI_API_KEY"):
-        raise AuthenticationError("Enter your OpenAI API key in the sidebar. You can get a key at https://platform.openai.com/account/api-keys.")
+        raise AuthenticationError("Enter your OpenAI API key in the sidebar. 
+         You can get a key at https://platform.openai.com/account/api-keys.")
     else:
         # Embed the chunks
-        embeddings = OpenAIEmbeddings(openai_api_key=st.session_state.get("OPENAI_API_KEY"))  # type: ignore
+        embeddings = OpenAIEmbeddings(openai_api_key=st.session_state.get("OPENAI_API_KEY"))
         index = FAISS.from_documents(docs, embeddings)
-
         return index
 
 
