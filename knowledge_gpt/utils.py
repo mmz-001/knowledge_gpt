@@ -91,12 +91,14 @@ def embed_docs(docs: List[Document]) -> VectorStore:
     if not st.session_state.get("OPENAI_API_KEY"):
         raise AuthenticationError(
             """Enter your OpenAI API key in the sidebar.
-            You can get a key at https://platform.openai.com/account/api-keys."""
+            You can get a key at
+            https://platform.openai.com/account/api-keys."""
         )
     else:
         # Embed the chunks
         embeddings = OpenAIEmbeddings(
-            openai_api_key=st.session_state.get("OPENAI_API_KEY"))  # type: ignore
+            openai_api_key=st.session_state.get(
+                "OPENAI_API_KEY"))  # type: ignore
         index = FAISS.from_documents(docs, embeddings)
 
         return index
@@ -119,7 +121,7 @@ def get_answer(docs: List[Document], query: str) -> Dict[str, Any]:
     # Get the answer
 
     chain = load_qa_with_sources_chain(OpenAI(
-        temperature=0,openai_api_key=st.session_state.get(
+        temperature=0, openai_api_key=st.session_state.get(
             "OPENAI_API_KEY")), chain_type="stuff",
                                        prompt=STUFF_PROMPT)  # type: ignore
 
