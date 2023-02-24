@@ -46,8 +46,8 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
         if "model_name" in values:
             if "document_model_name" in values:
                 raise ValueError(
-                    """Both `model_name` and
-                    `document_model_name` were provided,
+                    """Both model_name and
+                    document_model_name were provided,
                     but only one should be."""
                 )
             if "query_model_name" in values:
