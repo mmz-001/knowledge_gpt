@@ -5,13 +5,11 @@ from typing import Any, Dict, List
 import docx2txt
 import streamlit as st
 from embeddings import OpenAIEmbeddings
-from langchain import Cohere, OpenAI
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from langchain.docstore.document import Document
 from langchain.llms import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS, VectorStore
-from langchain.vectorstores.faiss import FAISS
 from openai.error import AuthenticationError
 from prompts import STUFF_PROMPT
 from pypdf import PdfReader
