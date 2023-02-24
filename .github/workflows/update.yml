@@ -14,7 +14,6 @@ jobs:
       run: pip install flake8
       
     - name: Run tests
-i191715_test
+
       run: flake8 knowledge_gpt/embeddings.py
-      run: flake8 knowledge_gpt/utils.py
-main
+
