@@ -73,8 +73,8 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
                 metadata={"page": doc.metadata["page"], "chunk": i}
             )
             
-            doc.metadata["source"] = 
-            f"{doc.metadata['page']}-{doc.metadata['chunk']}"
+            doc.metadata["source"] = f"{doc.metadata['page']}-
+            {doc.metadata['chunk']}"
             doc_chunks.append(doc)
     return doc_chunks
 
