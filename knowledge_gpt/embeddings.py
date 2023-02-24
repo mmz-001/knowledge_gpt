@@ -46,9 +46,11 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
         if "model_name" in values:
             if "document_model_name" in values:
                 raise ValueError(
-                    """Both model_name and
-                    document_model_name were provided,
+i191715_test
+                    """Both 'model_name' and
+                    'document_model_name' were provided,
                     but only one should be."""
+main
                 )
             if "query_model_name" in values:
                 raise ValueError(
@@ -94,8 +96,11 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
     def _embedding_func(self, text: str, *, engine: str) -> List[float]:
         """Call out to OpenAI's embedding
         endpoint with exponential backoff."""
+i191715_test
         # replace newlines, which can
         # negatively affect performance.
+
+main
         text = text.replace("\n", " ")
         return self.client.create(input=[text],
                                   engine=engine)["data"][0]["embedding"]
