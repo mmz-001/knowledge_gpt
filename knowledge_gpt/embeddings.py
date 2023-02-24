@@ -94,9 +94,11 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
     def _embedding_func(self, text: str, *, engine: str) -> List[float]:
         """Call out to OpenAI's embedding
         endpoint with exponential backoff."""
-        # replace newlines, which can negatively affect performance.
+        # replace newlines, which can 
+        #negatively affect performance.
         text = text.replace("\n", " ")
-        return self.client.create(input=[text], engine=engine)["data"][0]["embedding"]
+        return self.client.create(input=[text],
+                                  engine=engine)["data"][0]["embedding"]
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Call out to OpenAI's embedding 
