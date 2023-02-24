@@ -13,12 +13,18 @@ from openai.error import AuthenticationError
 from prompts import STUFF_PROMPT
 from pypdf import PdfReader
 @st.experimental_memo()
+
+
 def parse_docx(file: BytesIO) -> str:
     text = docx2txt.process(file)
     # Remove multiple newlines
     text = re.sub(r"\n\s*\n", "\n\n", text)
     return text
+
+
 @st.experimental_memo()
+
+
 def parse_pdf(file: BytesIO) -> List[str]:
     pdf = PdfReader(file)
     output = []
@@ -63,8 +69,8 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
     for doc in page_docs:
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=800,
-            separators=["\n\n", "\n", ".", "!", "?", ",", " ", ""],
-            chunk_overlap=0,
+            separators=["\n\n", "\n", ".", "!",
+                        "?", ",", " ", ""],chunk_overlap=0,
         )
         chunks = text_splitter.split_text(doc.page_content)
         for i, chunk in enumerate(chunks):
@@ -79,7 +85,10 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
     return doc_chunks
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+@st.cache(allow_output_mutation=True,
+          show_spinner=False)
+
+
 def embed_docs(docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index"""
 
