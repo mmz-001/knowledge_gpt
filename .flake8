@@ -1,0 +1,10 @@
+[flake8]
+exclude =
+    venv
+    .venv
+    __pycache__
+    notebooks
+    data
+# Recommend matching the black line length (default 88),
+# rather than using the flake8 default of 79:
+max-line-length = 88

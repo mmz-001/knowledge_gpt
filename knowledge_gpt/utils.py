@@ -5,12 +5,11 @@ from typing import Any, Dict, List
 import docx2txt
 import streamlit as st
 from embeddings import OpenAIEmbeddings
-from langchain import Cohere, OpenAI
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from langchain.docstore.document import Document
 from langchain.llms import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS, VectorStore
+from langchain.vectorstores import VectorStore
 from langchain.vectorstores.faiss import FAISS
 from openai.error import AuthenticationError
 from prompts import STUFF_PROMPT
@@ -90,11 +89,14 @@ def embed_docs(docs: List[Document]) -> VectorStore:
 
     if not st.session_state.get("OPENAI_API_KEY"):
         raise AuthenticationError(
-            "Enter your OpenAI API key in the sidebar. You can get a key at https://platform.openai.com/account/api-keys."
+            "Enter your OpenAI API key in the sidebar. You can get a key at"
+            " https://platform.openai.com/account/api-keys."
         )
     else:
         # Embed the chunks
-        embeddings = OpenAIEmbeddings(openai_api_key=st.session_state.get("OPENAI_API_KEY"))  # type: ignore
+        embeddings = OpenAIEmbeddings(
+            openai_api_key=st.session_state.get("OPENAI_API_KEY")
+        )  # type: ignore
         index = FAISS.from_documents(docs, embeddings)
 
         return index
@@ -116,10 +118,18 @@ def get_answer(docs: List[Document], query: str) -> Dict[str, Any]:
 
     # Get the answer
 
-    chain = load_qa_with_sources_chain(OpenAI(temperature=0, openai_api_key=st.session_state.get("OPENAI_API_KEY")), chain_type="stuff", prompt=STUFF_PROMPT)  # type: ignore
+    chain = load_qa_with_sources_chain(
+        OpenAI(
+            temperature=0, openai_api_key=st.session_state.get("OPENAI_API_KEY")
+        ),  # type: ignore
+        chain_type="stuff",
+        prompt=STUFF_PROMPT,
+    )
 
     # Cohere doesn't work very well as of now.
-    # chain = load_qa_with_sources_chain(Cohere(temperature=0), chain_type="stuff", prompt=STUFF_PROMPT)  # type: ignore
+    # chain = load_qa_with_sources_chain(
+    #     Cohere(temperature=0), chain_type="stuff", prompt=STUFF_PROMPT  # type: ignore
+    # )
     answer = chain(
         {"input_documents": docs, "question": query}, return_only_outputs=True
     )
