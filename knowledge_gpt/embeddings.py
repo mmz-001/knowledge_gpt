@@ -16,10 +16,8 @@ from tenacity import (
 class OpenAIEmbeddings(BaseModel, Embeddings):
     """Wrapper around OpenAI embedding models.
 
-    To use, you should have the ``openai``
-    python package installed, and the
-    environment variable ``OPENAI_API_KEY``
-    set with your API key or pass it
+    To use, you should have the ``openai`` python package installed, and the
+    environment variable ``OPENAI_API_KEY`` set with your API key or pass it
     as a named parameter to the constructor.
 
     Example:
@@ -46,15 +44,13 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
         if "model_name" in values:
             if "document_model_name" in values:
                 raise ValueError(
-                    """Both 'model_name' and
-                    'document_model_name' were provided,
-                    but only one should be."""
+                    "Both `model_name` and `document_model_name` were provided, "
+                    "but only one should be."
                 )
             if "query_model_name" in values:
                 raise ValueError(
-                    """Both `model_name` and
-                    `query_model_name` were provided,
-                    but only one should be."""
+                    "Both `model_name` and `query_model_name` were provided, "
+                    "but only one should be."
                 )
             model_name = values.pop("model_name")
             values["document_model_name"] = f"text-search-{model_name}-doc-001"
@@ -63,8 +59,7 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
 
     @root_validator(allow_reuse=True)
     def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that api key and
-        python package exists in environment."""
+        """Validate that api key and python package exists in environment."""
         openai_api_key = get_from_dict_or_env(
             values, "openai_api_key", "OPENAI_API_KEY"
         )
@@ -92,18 +87,13 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
         ),
     )
     def _embedding_func(self, text: str, *, engine: str) -> List[float]:
-        """Call out to OpenAI's embedding
-        endpoint with exponential backoff."""
-        # replace newlines, which can
-        # negatively affect performance.
-
+        """Call out to OpenAI's embedding endpoint with exponential backoff."""
+        # replace newlines, which can negatively affect performance.
         text = text.replace("\n", " ")
-        return self.client.create(input=[text],
-                                  engine=engine)["data"][0]["embedding"]
+        return self.client.create(input=[text], engine=engine)["data"][0]["embedding"]
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Call out to OpenAI's embedding
-        endpoint for embedding search docs.
+        """Call out to OpenAI's embedding endpoint for embedding search docs.
 
         Args:
             texts: The list of texts to embed.
@@ -118,8 +108,7 @@ class OpenAIEmbeddings(BaseModel, Embeddings):
         return responses
 
     def embed_query(self, text: str) -> List[float]:
-        """Call out to OpenAI's embedding
-        endpoint for embedding query text.
+        """Call out to OpenAI's embedding endpoint for embedding query text.
 
         Args:
             text: The text to embed.
