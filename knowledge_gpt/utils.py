@@ -38,7 +38,7 @@ def parse_pdf(file: BytesIO) -> List[str]:
         text = re.sub(r"\n\s*\n", "\n\n", text)
 
         output.append(text)
-
+    output = "/n".join(output)
     return output
 
 
