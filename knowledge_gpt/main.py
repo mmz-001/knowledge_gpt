@@ -28,20 +28,22 @@ uploaded_file = st.file_uploader(
     type=["pdf", "docx", "txt"],
     help="Scanned documents are not supported yet!",
     on_change=clear_submit,
+    accept_multiple_files = True
 )
 
 index = None
 doc = None
 if uploaded_file is not None:
-    if uploaded_file.name.endswith(".pdf"):
-        doc = parse_pdf(uploaded_file)
-    elif uploaded_file.name.endswith(".docx"):
-        doc = parse_docx(uploaded_file)
-    elif uploaded_file.name.endswith(".txt"):
-        doc = parse_txt(uploaded_file)
-    else:
-        raise ValueError("File type not supported!")
-    text = text_to_docs(doc)
+    if len(uploaded_file) > 1:
+        if uploaded_file[0].name.endswith(".pdf"): 
+            docs = [parse_pdf(doc_x) for doc_x in uploaded_file if doc_x.name.endswith(".pdf")]
+        elif uploaded_file[0].name.endswith(".docx"): 
+            docs = [parse_docx(doc_x) for doc_x in uploaded_file if doc_x.name.endswith(".docx")]
+        elif uploaded_file[0].name.endswith(".txt"): 
+            docs = [parse_txt(doc_x) for doc_x in uploaded_file if doc_x.name.endswith(".txt")]
+        else: raise ValueError("File type not supported!")   
+        
+    text = text_to_docs(docs)
     try:
         with st.spinner("Indexing document... This may take a while⏳"):
             index = embed_docs(text)
