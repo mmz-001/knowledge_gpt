@@ -34,7 +34,7 @@ uploaded_file = st.file_uploader(
 index = None
 doc = None
 if uploaded_file is not None:
-    if len(uploaded_file) > 1:
+    if len(uploaded_file) > 1: # Must be removed for one file upload
         if uploaded_file[0].name.endswith(".pdf"): 
             docs = [parse_pdf(doc_x) for doc_x in uploaded_file if doc_x.name.endswith(".pdf")]
         elif uploaded_file[0].name.endswith(".docx"): 
