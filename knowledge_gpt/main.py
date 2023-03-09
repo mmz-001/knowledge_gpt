@@ -32,7 +32,7 @@ uploaded_file = st.file_uploader(
 )
 
 index = None
-doc = None
+docs = None
 if uploaded_file is not None:
     if len(uploaded_file) > 1: # Must be removed for one file upload
         if uploaded_file[0].name.endswith(".pdf"): 

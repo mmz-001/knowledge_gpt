@@ -36,4 +36,4 @@ def sidebar():
             "with your feedback and suggestions💡"
         )
         st.markdown("---")
-        st.markdown("Made by [mmz_001](https://twitter.com/mm_sasmitha)")
+        st.markdown("Made by [Arsene Keya]")
