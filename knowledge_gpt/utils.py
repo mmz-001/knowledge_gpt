@@ -12,8 +12,9 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import VectorStore
 from langchain.vectorstores.faiss import FAISS
 from openai.error import AuthenticationError
-from prompts import STUFF_PROMPT
 from pypdf import PdfReader
+
+from knowledge_gpt.prompts import STUFF_PROMPT
 
 
 @st.experimental_memo()
