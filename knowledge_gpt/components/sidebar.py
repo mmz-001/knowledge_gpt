@@ -1,7 +1,14 @@
 import streamlit as st
 
 from knowledge_gpt.components.faq import faq
+import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+openai_api_key = os.environ.get('OPENAI_API_KEY')
 
 def set_openai_api_key(api_key: str):
     st.session_state["OPENAI_API_KEY"] = api_key
@@ -20,7 +27,9 @@ def sidebar():
             type="password",
             placeholder="Paste your OpenAI API key here (sk-...)",
             help="You can get your API key from https://platform.openai.com/account/api-keys.",  # noqa: E501
-            value=st.session_state.get("OPENAI_API_KEY", ""),
+            value= openai_api_key,
+            #value=st.session_state.get("OPENAI_API_KEY", ""),
+            
         )
 
         if api_key_input:

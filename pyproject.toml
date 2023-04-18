@@ -19,6 +19,7 @@ pillow = "^9.4.0"
 pypdf = "^3.3.0"
 tenacity = "^8.2.0"
 pypdf2 = "^3.0.1"
+poetry-dotenv-plugin = "^0.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

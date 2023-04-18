@@ -33,6 +33,7 @@ uploaded_files = st.file_uploader(
  )
 
 indexes = []
+document_names = []
 if uploaded_files is not None:
     for uploaded_file in uploaded_files:
         if uploaded_file.name.endswith(".pdf"):
@@ -48,6 +49,7 @@ if uploaded_files is not None:
             with st.spinner(f"Indexing document {uploaded_file.name}... This may take a while⏳"):
                 index = embed_docs(text)
                 indexes.append(index)
+                document_names.append(uploaded_file.name)
             st.session_state["api_key_configured"] = True
         except OpenAIError as e:
             st.error(e._message)
@@ -63,6 +65,9 @@ if show_full_doc and doc:
         # Hack to get around st.markdown rendering LaTeX
         st.markdown(f"<p>{wrap_text_in_html(doc)}</p>", unsafe_allow_html=True)
 
+def has_low_probability(text: str) -> bool:
+    return "<Probability: low>" in text
+
 button = st.button("Submit")
 if button or st.session_state.get("submit"):
     if not st.session_state.get("api_key_configured"):
@@ -74,27 +79,31 @@ if button or st.session_state.get("submit"):
     else:
         st.session_state["submit"] = True
         for i, index in enumerate(indexes):
-            st.markdown(f"## Document {i+1}")
-            # Output Columns
-            answer_col, sources_col = st.columns(2)
-            sources = search_docs(index, query)
 
             try:
+                # Output Columns
+                sources = search_docs(index, query)
                 answer = get_answer(sources, query)
-                if not show_all_chunks:
-                    # Get the sources for the answer
-                    sources = get_sources(answer, sources)
+                # print(answer)
 
-                with answer_col:
-                    st.markdown("#### Answer")
-                    st.markdown(answer["output_text"].split("SOURCES: ")[0])
+                if not has_low_probability(answer["output_text"]):
+                    st.markdown(f"### Document: {document_names[i]}")
+                    answer_col, sources_col = st.columns(2)
 
-                with sources_col:
-                    st.markdown("#### Sources")
-                    for source in sources:
-                        st.markdown(source.page_content)
-                        st.markdown(source.metadata["source"])
-                        st.markdown("---")
+                    if not show_all_chunks:
+                        # Get the sources for the answer
+                        sources = get_sources(answer, sources)
+
+                    with answer_col:
+                        st.markdown("#### Answer")
+                        st.markdown(answer["output_text"].split("SOURCES: ")[0])
+
+                    with sources_col:
+                        st.markdown("#### Sources")
+                        for source in sources:
+                            st.markdown(source.page_content)
+                            st.markdown(source.metadata["source"])
+                            st.markdown("---")
 
             except OpenAIError as e:
                 st.error(e._message)
