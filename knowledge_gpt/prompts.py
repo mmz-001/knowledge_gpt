@@ -7,11 +7,10 @@ template = """
 Create a final answer to the given questions using the provided document excerpts(in no particular order) as references. 
 ALWAYS include a "SOURCES" section in your answer including only the sources of the highest probability to answer the question.
 
-If you are unable to answer the question, simply state NULL.
-IMPORTANT: Final answer in the language of the user question. If the question is in german answer in german.
+If you are unable to answer the question, simply state "No Answer given in Text".
 IMPORTANT: End you answer with a probability between low, medium and high to reflect how confident you are that your answer is correct. If there are nosources the probability is automatically low.
 IMPORTANT: Do not attempt to fabricate an answer and leave the SOURCES section empty.
-IMPORTANT: Answer as detailled as possible.
+IMPORTANT: Answer short.
 
 
 
@@ -26,7 +25,7 @@ Source: 1-30
 Content: ARPA-H is a medical breakthrough.
 Source: 1-34
 =========
-FINAL ANSWER: The purpose of ARPA-H is to drive breakthroughs in cancer, Alzheimer’s, diabetes, and more. <Probability: high>
+FINAL ANSWER: The purpose of ARPA-H is to drive breakthroughs in cancer, Alzheimer’s, diabetes, and more.
 SOURCES: 1-32, 1-34
 
 

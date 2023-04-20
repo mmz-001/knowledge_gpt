@@ -1,3 +1,4 @@
+
 import streamlit as st
 from openai.error import OpenAIError
 
@@ -24,6 +25,7 @@ st.header("📖KnowledgeGPT")
 
 sidebar()
 
+
 uploaded_files = st.file_uploader(
      "Upload one or more pdf, docx, or txt files",
      type=["pdf", "docx", "txt"],
@@ -34,6 +36,7 @@ uploaded_files = st.file_uploader(
 
 indexes = []
 document_names = []
+
 if uploaded_files is not None:
     for uploaded_file in uploaded_files:
         if uploaded_file.name.endswith(".pdf"):
