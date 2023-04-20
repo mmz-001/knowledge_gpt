@@ -1,10 +1,18 @@
 # flake8: noqa
 from langchain.prompts import PromptTemplate
-
+#CONTENT:<span style="color: red"> ARPA-H will have a singular purpose—to drive breakthroughs in cancer, Alzheimer’s, diabetes, and more. ARPA-H is a medical breakthrough.</span>
+#IMPORTANT: If you found important information to answer the question in the text insert tags "<span style="color: red"> Important Information </span>" around the text to mark it red.
 ## Use a shorter template to reduce the number of tokens in the prompt
-template = """Create a final answer to the given questions using the provided document excerpts(in no particular order) as references. ALWAYS include a "SOURCES" section in your answer including only the minimal set of sources needed to answer the question. If you are unable to answer the question, simply state that you do not know. Do not attempt to fabricate an answer and leave the SOURCES section empty.
+template = """
+Create a final answer to the given questions using the provided document excerpts(in no particular order) as references. 
+ALWAYS include a "SOURCES" section in your answer including only the sources of the highest probability to answer the question.
 
----------
+If you are unable to answer the question, simply state "No Answer given in Text".
+IMPORTANT: End you answer with a probability between low, medium and high to reflect how confident you are that your answer is correct. If there are nosources the probability is automatically low.
+IMPORTANT: Do not attempt to fabricate an answer and leave the SOURCES section empty.
+IMPORTANT: Answer short.
+
+
 
 QUESTION: What  is the purpose of ARPA-H?
 =========
@@ -14,11 +22,12 @@ Content: While we’re at it, let’s make sure every American can get the healt
 Source: 1-33
 Content: The V.A. is pioneering new ways of linking toxic exposures to disease, already helping  veterans get the care they deserve. \n\nWe need to extend that same care to all Americans. \n\nThat’s why I’m calling on Congress to pass legislation that would establish a national registry of toxic exposures, and provide health care and financial assistance to those affected.
 Source: 1-30
+Content: ARPA-H is a medical breakthrough.
+Source: 1-34
 =========
 FINAL ANSWER: The purpose of ARPA-H is to drive breakthroughs in cancer, Alzheimer’s, diabetes, and more.
-SOURCES: 1-32
+SOURCES: 1-32, 1-34
 
----------
 
 QUESTION: {question}
 =========

@@ -6,6 +6,7 @@ data/local_data/
 
 # VSCode
 .vscode/
+.history/*
 
 # TODO
 TODO.md

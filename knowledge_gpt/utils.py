@@ -2,6 +2,7 @@ import re
 from io import BytesIO
 from typing import Any, Dict, List
 
+
 import docx2txt
 import streamlit as st
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
@@ -15,6 +16,7 @@ from pypdf import PdfReader
 
 from knowledge_gpt.embeddings import OpenAIEmbeddings
 from knowledge_gpt.prompts import STUFF_PROMPT
+
 
 
 @st.experimental_memo()
@@ -136,7 +138,6 @@ def get_answer(docs: List[Document], query: str) -> Dict[str, Any]:
     )
     return answer
 
-
 @st.cache(allow_output_mutation=True)
 def get_sources(answer: Dict[str, Any], docs: List[Document]) -> List[Document]:
     """Gets the source documents for an answer."""
@@ -150,6 +151,8 @@ def get_sources(answer: Dict[str, Any], docs: List[Document]) -> List[Document]:
             source_docs.append(doc)
 
     return source_docs
+
+
 
 
 def wrap_text_in_html(text: str | List[str]) -> str:
