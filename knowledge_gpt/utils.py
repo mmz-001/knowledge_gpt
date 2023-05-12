@@ -3,6 +3,7 @@ from io import BytesIO
 from typing import Any, Dict, List
 
 import docx2txt
+from langchain import ConversationChain, LLMChain, PromptTemplate
 import streamlit as st
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from langchain.docstore.document import Document
@@ -12,12 +13,19 @@ from langchain.vectorstores import VectorStore
 from langchain.vectorstores.faiss import FAISS
 from openai.error import AuthenticationError
 from pypdf import PdfReader
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+
+
+# Does it work?
+from langchain.callbacks.streamlit import StreamlitCallbackHandler
 
 from knowledge_gpt.embeddings import OpenAIEmbeddings
 from knowledge_gpt.prompts import STUFF_PROMPT
+from langchain.schema import messages_from_dict, messages_to_dict
 
 
-@st.experimental_memo()
+@st.cache_data()
 def parse_docx(file: BytesIO) -> str:
     text = docx2txt.process(file)
     # Remove multiple newlines
@@ -25,7 +33,7 @@ def parse_docx(file: BytesIO) -> str:
     return text
 
 
-@st.experimental_memo()
+@st.cache_data()
 def parse_pdf(file: BytesIO) -> List[str]:
     pdf = PdfReader(file)
     output = []
@@ -43,7 +51,7 @@ def parse_pdf(file: BytesIO) -> List[str]:
     return output
 
 
-@st.experimental_memo()
+@st.cache_data()
 def parse_txt(file: BytesIO) -> str:
     text = file.read().decode("utf-8")
     # Remove multiple newlines
@@ -51,7 +59,7 @@ def parse_txt(file: BytesIO) -> str:
     return text
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data
 def text_to_docs(text: str | List[str]) -> List[Document]:
     """Converts a string or list of strings to a list of Documents
     with metadata."""
@@ -84,8 +92,8 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
     return doc_chunks
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
-def embed_docs(docs: List[Document]) -> VectorStore:
+@st.cache_data(show_spinner=False)
+def embed_docs(_docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index"""
 
     if not st.session_state.get("OPENAI_API_KEY"):
@@ -98,54 +106,85 @@ def embed_docs(docs: List[Document]) -> VectorStore:
         embeddings = OpenAIEmbeddings(
             openai_api_key=st.session_state.get("OPENAI_API_KEY")
         )  # type: ignore
-        index = FAISS.from_documents(docs, embeddings)
+        index = FAISS.from_documents(_docs, embeddings)
 
         return index
 
 
-@st.cache(allow_output_mutation=True)
-def search_docs(index: VectorStore, query: str) -> List[Document]:
+@st.cache_data
+def search_docs(_index: VectorStore, query: str) -> List[Document]:
     """Searches a FAISS index for similar chunks to the query
     and returns a list of Documents."""
 
     # Search for similar chunks
-    docs = index.similarity_search(query, k=5)
+    docs = _index.similarity_search(query, k=5)
     return docs
 
 
-@st.cache(allow_output_mutation=True)
-def get_answer(docs: List[Document], query: str) -> Dict[str, Any]:
+@st.cache_data
+def get_answer_by_source(_docs: List[Document], query: str) -> Dict[str, Any]:
     """Gets an answer to a question from a list of Documents."""
 
     # Get the answer
 
     chain = load_qa_with_sources_chain(
-        OpenAI(
-            temperature=0, openai_api_key=st.session_state.get("OPENAI_API_KEY")
-        ),  # type: ignore
+        # OpenAI(
+        #     temperature=0, 
+        #     openai_api_key=st.session_state.get("OPENAI_API_KEY"),
+        #     model_name="gpt-3.5-turbo",
+        # ),  # type: ignore
+        ChatOpenAI(
+            temperature=0,
+            streaming=True,
+            verbose=True,
+            openai_api_key=st.session_state.get("OPENAI_API_KEY"),
+            # model_name="gpt-4",
+        ), 
         chain_type="stuff",
         prompt=STUFF_PROMPT,
     )
 
-    # Cohere doesn't work very well as of now.
-    # chain = load_qa_with_sources_chain(
-    #     Cohere(temperature=0), chain_type="stuff", prompt=STUFF_PROMPT  # type: ignore
-    # )
     answer = chain(
-        {"input_documents": docs, "question": query}, return_only_outputs=True
+        {"input_documents": _docs, "question": query}, return_only_outputs=True
     )
     return answer
 
+chatbot_template = """You are a chatbot that talks to humans.
 
-@st.cache(allow_output_mutation=True)
-def get_sources(answer: Dict[str, Any], docs: List[Document]) -> List[Document]:
+    {chat_history}
+    Human: {human_input}
+    Chatbot:"""
+chatbot_prompt = PromptTemplate(
+    input_variables=["chat_history", "human_input"],
+    template=chatbot_template
+)
+memory = ConversationBufferMemory(memory_key="chat_history")
+conversation_chain = LLMChain(
+    llm=ChatOpenAI(
+        temperature=0,
+        streaming=True,
+        verbose=True,
+        openai_api_key=st.session_state.get("OPENAI_API_KEY"),
+        # model_name="gpt-4",
+    ), 
+    prompt=chatbot_prompt,
+    verbose=True,
+    memory=memory,
+)
+@st.cache_data
+def get_answer_by_chat(query: str) -> Dict[str, Any]:
+    return conversation_chain.predict(human_input=query)
+
+
+@st.cache_data
+def get_sources(_answer: Dict[str, Any], _docs: List[Document]) -> List[Document]:
     """Gets the source documents for an answer."""
 
     # Get sources for the answer
-    source_keys = [s for s in answer["output_text"].split("SOURCES: ")[-1].split(", ")]
+    source_keys = [s for s in _answer["output_text"].split("SOURCES: ")[-1].split(", ")]
 
     source_docs = []
-    for doc in docs:
+    for doc in _docs:
         if doc.metadata["source"] in source_keys:
             source_docs.append(doc)
 

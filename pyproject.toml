@@ -9,11 +9,11 @@ packages = [{include = "knowledge_gpt"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-streamlit = "^1.17.0"
-langchain = "0.0.79"
+streamlit = "^1.22.0"
+langchain = "0.0.166"
 cohere = "^3.2.1"
-faiss-cpu = "^1.7.3"
-openai = "^0.26.2"
+faiss-cpu = "^1.7.4"
+openai = "^0.27.6"
 docx2txt = "^0.8"
 pillow = "^9.4.0"
 pypdf = "^3.3.0"

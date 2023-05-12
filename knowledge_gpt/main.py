@@ -4,7 +4,8 @@ from openai.error import OpenAIError
 from knowledge_gpt.components.sidebar import sidebar
 from knowledge_gpt.utils import (
     embed_docs,
-    get_answer,
+    get_answer_by_chat,
+    get_answer_by_source,
     get_sources,
     parse_docx,
     parse_pdf,
@@ -15,12 +16,13 @@ from knowledge_gpt.utils import (
 )
 
 
+
 def clear_submit():
     st.session_state["submit"] = False
 
 
-st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
-st.header("📖KnowledgeGPT")
+st.set_page_config(page_title="ConsultGPT", page_icon="📖", layout="wide")
+st.header("📖ConsultGPT")
 
 sidebar()
 
@@ -50,6 +52,7 @@ if uploaded_file is not None:
     except OpenAIError as e:
         st.error(e._message)
 
+
 query = st.text_area("Ask a question about the document", on_change=clear_submit)
 with st.expander("Advanced Options"):
     show_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
@@ -62,20 +65,28 @@ if show_full_doc and doc:
 
 button = st.button("Submit")
 if button or st.session_state.get("submit"):
-    if not st.session_state.get("api_key_configured"):
+    if not st.session_state.get("OPENAI_API_KEY"):
         st.error("Please configure your OpenAI API key!")
-    elif not index:
-        st.error("Please upload a document!")
     elif not query:
         st.error("Please enter a question!")
+    elif not index:
+        answer_col, sources_col = st.columns(2)
+        try:
+            answer = get_answer_by_chat(query=query)
+        except OpenAIError as e:
+            st.error(e._message)
+        
+        with answer_col:
+            st.markdown("#### Answer")
+            st.markdown(answer)
     else:
-        st.session_state["submit"] = True
+        # st.session_state["submit"] = True
         # Output Columns
         answer_col, sources_col = st.columns(2)
         sources = search_docs(index, query)
 
         try:
-            answer = get_answer(sources, query)
+            answer = get_answer_by_source(sources, query)
             if not show_all_chunks:
                 # Get the sources for the answer
                 sources = get_sources(answer, sources)
