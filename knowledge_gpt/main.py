@@ -21,8 +21,8 @@ def clear_submit():
     st.session_state["submit"] = False
 
 
-st.set_page_config(page_title="ConsultGPT", page_icon="📖", layout="wide")
-st.header("📖ConsultGPT")
+st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
+st.header("📖KnowledgeGPT")
 
 sidebar()
 
@@ -70,6 +70,7 @@ if button or st.session_state.get("submit"):
     elif not query:
         st.error("Please enter a question!")
     elif not index:
+        st.error("Please upload a document!")
         answer_col, sources_col = st.columns(2)
         try:
             answer = get_answer_by_chat(query=query)

@@ -138,7 +138,7 @@ def get_answer_by_source(_docs: List[Document], query: str) -> Dict[str, Any]:
             streaming=True,
             verbose=True,
             openai_api_key=st.session_state.get("OPENAI_API_KEY"),
-            # model_name="gpt-4",
+            model_name="gpt-4",
         ), 
         chain_type="stuff",
         prompt=STUFF_PROMPT,
