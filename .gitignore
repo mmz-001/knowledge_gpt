@@ -154,3 +154,4 @@ cython_debug/
 
 
 .DS_Store
+data/*.pdf

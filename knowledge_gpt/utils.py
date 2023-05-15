@@ -92,9 +92,10 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
     return doc_chunks
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def embed_docs(_docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index"""
+    print("Embedding docs: %s" % _docs)
 
     if not st.session_state.get("OPENAI_API_KEY"):
         raise AuthenticationError(
@@ -111,72 +112,73 @@ def embed_docs(_docs: List[Document]) -> VectorStore:
         return index
 
 
-@st.cache_data
+@st.cache_data()
 def search_docs(_index: VectorStore, query: str) -> List[Document]:
+    print("Searching...index: %s" % _index)
     """Searches a FAISS index for similar chunks to the query
     and returns a list of Documents."""
 
     # Search for similar chunks
-    docs = _index.similarity_search(query, k=5)
+    docs = _index.similarity_search(query, k=3)
     return docs
 
 
-@st.cache_data
+@st.cache_data()
 def get_answer_by_source(_docs: List[Document], query: str) -> Dict[str, Any]:
     """Gets an answer to a question from a list of Documents."""
 
     # Get the answer
 
     chain = load_qa_with_sources_chain(
-        # OpenAI(
+        # llm=OpenAI(
         #     temperature=0, 
         #     openai_api_key=st.session_state.get("OPENAI_API_KEY"),
-        #     model_name="gpt-3.5-turbo",
         # ),  # type: ignore
-        ChatOpenAI(
+        llm=ChatOpenAI(
             temperature=0,
             streaming=True,
             verbose=True,
             openai_api_key=st.session_state.get("OPENAI_API_KEY"),
+            # model_name="text-davinci-003",
             model_name="gpt-4",
         ), 
         chain_type="stuff",
         prompt=STUFF_PROMPT,
     )
-
+    print('----------getting answer for docs: %s' % _docs)
     answer = chain(
         {"input_documents": _docs, "question": query}, return_only_outputs=True
     )
+    print('----------answer: %s' % answer)
     return answer
 
-chatbot_template = """You are a chatbot that talks to humans.
+# chatbot_template = """You are a chatbot that talks to humans.
 
-    {chat_history}
-    Human: {human_input}
-    Chatbot:"""
-chatbot_prompt = PromptTemplate(
-    input_variables=["chat_history", "human_input"],
-    template=chatbot_template
-)
-memory = ConversationBufferMemory(memory_key="chat_history")
-conversation_chain = LLMChain(
-    llm=ChatOpenAI(
-        temperature=0,
-        streaming=True,
-        verbose=True,
-        openai_api_key=st.session_state.get("OPENAI_API_KEY"),
-        # model_name="gpt-4",
-    ), 
-    prompt=chatbot_prompt,
-    verbose=True,
-    memory=memory,
-)
+#     {chat_history}
+#     Human: {human_input}
+#     Chatbot:"""
+# chatbot_prompt = PromptTemplate(
+#     input_variables=["chat_history", "human_input"],
+#     template=chatbot_template
+# )
+# memory = ConversationBufferMemory(memory_key="chat_history")
+# conversation_chain = LLMChain(
+#     llm=ChatOpenAI(
+#         temperature=0,
+#         streaming=True,
+#         verbose=True,
+#         openai_api_key=st.session_state.get("OPENAI_API_KEY"),
+#         # model_name="gpt-4",
+#     ), 
+#     prompt=chatbot_prompt,
+#     verbose=True,
+#     memory=memory,
+# )
 @st.cache_data
 def get_answer_by_chat(query: str) -> Dict[str, Any]:
     return conversation_chain.predict(human_input=query)
 
 
-@st.cache_data
 def get_sources(_answer: Dict[str, Any], _docs: List[Document]) -> List[Document]:
     """Gets the source documents for an answer."""
 

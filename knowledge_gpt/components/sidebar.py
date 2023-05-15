@@ -12,7 +12,7 @@ def sidebar():
     with st.sidebar:
         st.markdown(
             "## How to use\n"
-            "1. Enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n"  # noqa: E501
+            "1. Add `export OPENAI_API_KEY=''` to you env or enter your [OpenAI API key](https://platform.openai.com/account/api-keys) below🔑\n" 
             "2. Upload a pdf, docx, or txt file📄\n"
             "3. Ask a question about the document💬\n"
         )
@@ -35,8 +35,6 @@ def sidebar():
         )
         st.markdown(
             "This tool is a work in progress. "
-            "You can contribute to the project on [GitHub](https://github.com/mmz-001/knowledge_gpt) "  # noqa: E501
-            "with your feedback and suggestions💡"
         )
         st.markdown("---")
 
