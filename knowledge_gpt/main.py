@@ -1,6 +1,6 @@
 import streamlit as st
 from openai.error import OpenAIError
-
+import os
 from knowledge_gpt.components.sidebar import sidebar
 from knowledge_gpt.utils import (
     embed_docs,
@@ -14,7 +14,8 @@ from knowledge_gpt.utils import (
     wrap_text_in_html,
 )
 
-st.session_state["OPENAI_API_KEY"] = "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"
+print('st.secrets', st.secrets)
+st.session_state["OPENAI_API_KEY"] = st.secrets.get("OPENAI_API_KEY", None)
 
 
 def clear_submit():
@@ -26,15 +27,23 @@ st.header("🧠 ThadGPT")
 
 sidebar()
 
-uploaded_file = st.file_uploader(
+uploaded_files = st.file_uploader(
     "Upload a pdf, docx, or txt file",
     type=["pdf", "docx", "txt"],
     help="Scanned documents are not supported yet!",
     on_change=clear_submit,
+    accept_multiple_files=True,
 )
-
+print('uploaded_files',uploaded_files)
 index = None
 doc = None
+
+if len(uploaded_files) > 0:
+    uploaded_file = uploaded_files[0]
+else:
+    uploaded_file = None
+
+
 if uploaded_file is not None:
     if uploaded_file.name.endswith(".pdf"):
         doc = parse_pdf(uploaded_file)
