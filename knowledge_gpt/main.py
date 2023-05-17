@@ -14,7 +14,7 @@ from knowledge_gpt.utils import (
     wrap_text_in_html,
 )
 
-st.session_state["OPENAI_API_KEY"] = "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"
+st.session_state["OPENAI_API_KEY"] = "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"
 
 
 def clear_submit():
