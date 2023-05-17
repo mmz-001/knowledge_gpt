@@ -13,8 +13,8 @@ from langchain.vectorstores.faiss import FAISS
 from openai.error import AuthenticationError
 from pypdf import PdfReader
 
-from knowledge_gpt.embeddings import OpenAIEmbeddings
-from knowledge_gpt.prompts import STUFF_PROMPT
+from thad_gpt.embeddings import OpenAIEmbeddings
+from thad_gpt.prompts import STUFF_PROMPT
 
 
 @st.cache_data()

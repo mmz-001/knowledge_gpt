@@ -14,8 +14,8 @@ Accurate answers and instant citations for your documents.
 1. Clone the repository📂
 
 ```bash
-git clone https://github.com/mmz-001/knowledge_gpt
-cd knowledge_gpt
+git clone https://github.com/mmz-001/thad_gpt
+cd thad_gpt
 ```
 
 2. Install dependencies with [Poetry](https://python-poetry.org/) and activate virtual environment🔨
@@ -28,7 +28,7 @@ poetry shell
 3. Run the Streamlit server🚀
 
 ```bash
-cd knowledge_gpt
+cd thad_gpt
 streamlit run main.py
 ```
 
