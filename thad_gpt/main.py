@@ -16,13 +16,17 @@ from thad_gpt.utils import (
 
 print('st.secrets', st.secrets)
 st.session_state["OPENAI_API_KEY"] = st.secrets.get("OPENAI_API_KEY", None)
-
+st.session_state["uploaded_files"] = []
 
 def clear_submit():
     st.session_state["submit"] = False
 
 
-st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
+st.set_page_config(
+    page_title="ThadGPT",
+    page_icon="🧠",
+    layout="wide",
+    )
 st.header("🧠 ThadGPT")
 
 sidebar()
@@ -42,6 +46,8 @@ if len(uploaded_files) == 0:
 if len(uploaded_files) > 0:
     doc = []
 
+    st.session_state["uploaded_files"] = uploaded_files
+
     for uploaded_file in uploaded_files:
         if uploaded_file.name.endswith(".pdf"):
             doc.extend(parse_pdf(uploaded_file))
@@ -52,7 +58,7 @@ if len(uploaded_files) > 0:
         else:
             raise ValueError("File type not supported!")
 
-    print("parsed docs", doc)    
+    print("parsed docs", doc)
 
     text = text_to_docs(doc)
 
