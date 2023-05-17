@@ -36,24 +36,26 @@ uploaded_files = st.file_uploader(
 )
 print('uploaded_files',uploaded_files)
 index = None
-doc = None
 
+if len(uploaded_files) == 0:
+    doc = None
 if len(uploaded_files) > 0:
-    uploaded_file = uploaded_files[0]
-else:
-    uploaded_file = None
+    doc = []
 
+    for uploaded_file in uploaded_files:
+        if uploaded_file.name.endswith(".pdf"):
+            doc.extend(parse_pdf(uploaded_file))
+        elif uploaded_file.name.endswith(".docx"):
+            doc.extend(parse_docx(uploaded_file))
+        elif uploaded_file.name.endswith(".txt"):
+            doc.extend(parse_txt(uploaded_file))
+        else:
+            raise ValueError("File type not supported!")
 
-if uploaded_file is not None:
-    if uploaded_file.name.endswith(".pdf"):
-        doc = parse_pdf(uploaded_file)
-    elif uploaded_file.name.endswith(".docx"):
-        doc = parse_docx(uploaded_file)
-    elif uploaded_file.name.endswith(".txt"):
-        doc = parse_txt(uploaded_file)
-    else:
-        raise ValueError("File type not supported!")
+    print("parsed docs", doc)    
+
     text = text_to_docs(doc)
+
     try:
         with st.spinner("Indexing document... This may take a while⏳"):
             index = embed_docs(text)
