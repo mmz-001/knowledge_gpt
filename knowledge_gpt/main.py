@@ -1,3 +1,4 @@
+
 import streamlit as st
 from openai.error import OpenAIError
 
@@ -17,6 +18,19 @@ from knowledge_gpt.utils import (
 
 def clear_submit():
     st.session_state["submit"] = False
+
+
+def create_chatbox(index):
+    query = st.text_input("Ask a question about the document in the chatbox")
+    if query:
+        sources = search_docs(index, query)
+        answer = get_answer(sources, query)
+        if answer:
+            st.write(answer["output_text"].split("SOURCES: ")[0])
+            sources = get_sources(answer, sources)
+            for source in sources:
+                st.write(source.page_content)
+                st.write(source.metadata["source"])
 
 
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
@@ -93,3 +107,8 @@ if button or st.session_state.get("submit"):
 
         except OpenAIError as e:
             st.error(e._message)
+
+# Call the create_chatbox function
+if index:
+    create_chatbox(index)
+
