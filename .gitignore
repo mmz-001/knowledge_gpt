@@ -1,6 +1,9 @@
 # Local data
 data/local_data/
 
+# Prototyping notebooks
+notebooks/
+
 # Secrets
 .streamlit/secrets.toml
 
