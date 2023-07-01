@@ -1,6 +1,6 @@
 from langchain.docstore.document import Document
 
-from knowledge_gpt.utils import get_sources
+from knowledge_gpt.utils.QA import get_sources
 
 
 def test_get_sources():
