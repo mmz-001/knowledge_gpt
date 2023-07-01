@@ -2,14 +2,15 @@ import streamlit as st
 from openai.error import OpenAIError
 
 from knowledge_gpt.components.sidebar import sidebar
-from knowledge_gpt.utils import (
+from knowledge_gpt.utils.QA import (
     embed_docs,
     get_answer,
     get_sources,
     parse_file,
     text_to_docs,
-    wrap_text_in_html,
 )
+
+from knowledge_gpt.utils.UI import wrap_text_in_html, is_valid
 
 
 def clear_submit():
@@ -54,34 +55,30 @@ if show_full_doc and texts:
 
 button = st.button("Submit")
 if button or st.session_state.get("submit"):
-    if not st.session_state.get("api_key_configured"):
-        st.error("Please configure your OpenAI API key!")
-    elif not index:
-        st.error("Please upload a document!")
-    elif not query:
-        st.error("Please enter a question!")
-    else:
-        st.session_state["submit"] = True
-        # Output Columns
-        answer_col, sources_col = st.columns(2)
-        sources = index.similarity_search(query, k=5)
+    if not is_valid(index, query):
+        st.stop()
 
-        try:
-            answer = get_answer(sources, query)
-            if not show_all_chunks:
-                # Get the sources for the answer
-                sources = get_sources(answer, sources)
+    st.session_state["submit"] = True
+    # Output Columns
+    answer_col, sources_col = st.columns(2)
+    sources = index.similarity_search(query, k=5)  # type: ignore
 
-            with answer_col:
-                st.markdown("#### Answer")
-                st.markdown(answer["output_text"].split("SOURCES: ")[0])
+    try:
+        answer = get_answer(sources, query)
+        if not show_all_chunks:
+            # Get the sources for the answer
+            sources = get_sources(answer, sources)
 
-            with sources_col:
-                st.markdown("#### Sources")
-                for source in sources:
-                    st.markdown(source.page_content)
-                    st.markdown(source.metadata["source"])
-                    st.markdown("---")
+        with answer_col:
+            st.markdown("#### Answer")
+            st.markdown(answer["output_text"].split("SOURCES: ")[0])
 
-        except OpenAIError as e:
-            st.error(e._message)
+        with sources_col:
+            st.markdown("#### Sources")
+            for source in sources:
+                st.markdown(source.page_content)
+                st.markdown(source.metadata["source"])
+                st.markdown("---")
+
+    except OpenAIError as e:
+        st.error(e._message)
