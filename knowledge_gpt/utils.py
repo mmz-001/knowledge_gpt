@@ -91,6 +91,19 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
     return doc_chunks
 
 
+@st.cache_data()
+def parse_file(file: BytesIO) -> str | List[str]:
+    """Parses a file and returns a list of Documents."""
+    if file.name.endswith(".pdf"):
+        return parse_pdf(file)
+    elif file.name.endswith(".docx"):
+        return parse_docx(file)
+    elif file.name.endswith(".txt"):
+        return parse_txt(file)
+    else:
+        raise ValueError("File type not supported!")
+
+
 @st.cache_data(show_spinner=False, hash_funcs={Document: hash_func})
 def embed_docs(docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index"""

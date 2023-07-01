@@ -6,9 +6,7 @@ from knowledge_gpt.utils import (
     embed_docs,
     get_answer,
     get_sources,
-    parse_docx,
-    parse_pdf,
-    parse_txt,
+    parse_file,
     text_to_docs,
     wrap_text_in_html,
 )
@@ -31,33 +29,28 @@ uploaded_file = st.file_uploader(
 )
 
 index = None
-doc = None
+texts = None
 if uploaded_file is not None:
-    if uploaded_file.name.endswith(".pdf"):
-        doc = parse_pdf(uploaded_file)
-    elif uploaded_file.name.endswith(".docx"):
-        doc = parse_docx(uploaded_file)
-    elif uploaded_file.name.endswith(".txt"):
-        doc = parse_txt(uploaded_file)
-    else:
-        raise ValueError("File type not supported!")
-    text = text_to_docs(doc)
+    texts = parse_file(uploaded_file)
+    docs = text_to_docs(texts)
+
     try:
         with st.spinner("Indexing document... This may take a while⏳"):
-            index = embed_docs(text)
+            index = embed_docs(docs)
         st.session_state["api_key_configured"] = True
     except OpenAIError as e:
         st.error(e._message)
 
 query = st.text_area("Ask a question about the document", on_change=clear_submit)
+
 with st.expander("Advanced Options"):
     show_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
     show_full_doc = st.checkbox("Show parsed contents of the document")
 
-if show_full_doc and doc:
+if show_full_doc and texts:
     with st.expander("Document"):
         # Hack to get around st.markdown rendering LaTeX
-        st.markdown(f"<p>{wrap_text_in_html(doc)}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p>{wrap_text_in_html(texts)}</p>", unsafe_allow_html=True)
 
 button = st.button("Submit")
 if button or st.session_state.get("submit"):
