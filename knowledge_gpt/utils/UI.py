@@ -11,7 +11,7 @@ def wrap_text_in_html(text: str | List[str]) -> str:
 
 
 def is_valid(index, query):
-    if not st.session_state.get("api_key_configured"):
+    if not st.session_state.get("OPENAI_API_KEY"):
         st.error("Please configure your OpenAI API key!")
         return False
     if not index:
