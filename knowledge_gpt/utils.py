@@ -13,7 +13,7 @@ from langchain.vectorstores.faiss import FAISS
 from openai.error import AuthenticationError
 from pypdf import PdfReader
 
-from knowledge_gpt.embeddings import OpenAIEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from knowledge_gpt.prompts import STUFF_PROMPT
 
 from hashlib import md5
@@ -103,8 +103,9 @@ def embed_docs(docs: List[Document]) -> VectorStore:
     else:
         # Embed the chunks
         embeddings = OpenAIEmbeddings(
-            openai_api_key=st.session_state.get("OPENAI_API_KEY")
+            openai_api_key=st.session_state.get("OPENAI_API_KEY"),
         )  # type: ignore
+
         index = FAISS.from_documents(docs, embeddings)
 
         return index
