@@ -16,8 +16,15 @@ from pypdf import PdfReader
 from knowledge_gpt.embeddings import OpenAIEmbeddings
 from knowledge_gpt.prompts import STUFF_PROMPT
 
+from hashlib import md5
 
-@st.experimental_memo()
+
+def hash_func(doc: Document) -> str:
+    """Hash function for caching Documents"""
+    return md5(doc.page_content.encode("utf-8")).hexdigest()
+
+
+@st.cache_data()
 def parse_docx(file: BytesIO) -> str:
     text = docx2txt.process(file)
     # Remove multiple newlines
@@ -25,7 +32,7 @@ def parse_docx(file: BytesIO) -> str:
     return text
 
 
-@st.experimental_memo()
+@st.cache_data()
 def parse_pdf(file: BytesIO) -> List[str]:
     pdf = PdfReader(file)
     output = []
@@ -43,7 +50,7 @@ def parse_pdf(file: BytesIO) -> List[str]:
     return output
 
 
-@st.experimental_memo()
+@st.cache_data()
 def parse_txt(file: BytesIO) -> str:
     text = file.read().decode("utf-8")
     # Remove multiple newlines
@@ -51,7 +58,7 @@ def parse_txt(file: BytesIO) -> str:
     return text
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data()
 def text_to_docs(text: str | List[str]) -> List[Document]:
     """Converts a string or list of strings to a list of Documents
     with metadata."""
@@ -84,7 +91,7 @@ def text_to_docs(text: str | List[str]) -> List[Document]:
     return doc_chunks
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False)
+@st.cache_data(show_spinner=False, hash_funcs={Document: hash_func})
 def embed_docs(docs: List[Document]) -> VectorStore:
     """Embeds a list of Documents and returns a FAISS index"""
 
@@ -103,17 +110,7 @@ def embed_docs(docs: List[Document]) -> VectorStore:
         return index
 
 
-@st.cache(allow_output_mutation=True)
-def search_docs(index: VectorStore, query: str) -> List[Document]:
-    """Searches a FAISS index for similar chunks to the query
-    and returns a list of Documents."""
-
-    # Search for similar chunks
-    docs = index.similarity_search(query, k=5)
-    return docs
-
-
-@st.cache(allow_output_mutation=True)
+@st.cache_data(show_spinner=False, hash_funcs={Document: hash_func})
 def get_answer(docs: List[Document], query: str) -> Dict[str, Any]:
     """Gets an answer to a question from a list of Documents."""
 
@@ -137,7 +134,7 @@ def get_answer(docs: List[Document], query: str) -> Dict[str, Any]:
     return answer
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data(show_spinner=False, hash_funcs={Document: hash_func})
 def get_sources(answer: Dict[str, Any], docs: List[Document]) -> List[Document]:
     """Gets the source documents for an answer."""
 
