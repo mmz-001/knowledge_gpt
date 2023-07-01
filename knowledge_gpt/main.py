@@ -9,7 +9,6 @@ from knowledge_gpt.utils import (
     parse_docx,
     parse_pdf,
     parse_txt,
-    search_docs,
     text_to_docs,
     wrap_text_in_html,
 )
@@ -72,7 +71,7 @@ if button or st.session_state.get("submit"):
         st.session_state["submit"] = True
         # Output Columns
         answer_col, sources_col = st.columns(2)
-        sources = search_docs(index, query)
+        sources = index.similarity_search(query, k=5)
 
         try:
             answer = get_answer(sources, query)
