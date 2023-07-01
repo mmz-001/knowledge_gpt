@@ -125,10 +125,6 @@ def get_answer(docs: List[Document], query: str) -> Dict[str, Any]:
         prompt=STUFF_PROMPT,
     )
 
-    # Cohere doesn't work very well as of now.
-    # chain = load_qa_with_sources_chain(
-    #     Cohere(temperature=0), chain_type="stuff", prompt=STUFF_PROMPT  # type: ignore
-    # )
     answer = chain(
         {"input_documents": docs, "question": query}, return_only_outputs=True
     )
