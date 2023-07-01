@@ -38,7 +38,6 @@ if uploaded_file is not None:
     try:
         with st.spinner("Indexing document... This may take a while⏳"):
             index = embed_docs(docs)
-        st.session_state["api_key_configured"] = True
     except OpenAIError as e:
         st.error(e._message)
 
