@@ -24,6 +24,8 @@ tiktoken = "^0.4.0"
 [tool.poetry.group.dev.dependencies]
 python-dotenv = "^0.21.1"
 pytest = "^7.2.1"
+ipykernel = "^6.23.3"
+ipywidgets = "^8.0.6"
 
 
 [tool.poetry.group.lint.dependencies]
