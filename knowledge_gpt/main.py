@@ -13,6 +13,14 @@ from knowledge_gpt.core.qa import get_answer, get_sources
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
 
+openai_api_key = st.session_state.get("OPENAI_API_KEY")
+
+if not openai_api_key:
+    st.warning(
+        "Enter your OpenAI API key in the sidebar. You can get a key at"
+        " https://platform.openai.com/account/api-keys."
+    )
+
 sidebar()
 
 uploaded_file = st.file_uploader(
@@ -30,7 +38,12 @@ file = chunk_file(file, chunk_size=800, chunk_overlap=0)
 
 
 with st.spinner("Indexing document... This may take a while⏳"):
-    index = embed_docs(file=file, embeddings="openai", vector_store="faiss")
+    index = embed_docs(
+        file=file,
+        embeddings="openai",
+        vector_store="faiss",
+        openai_api_key=openai_api_key,
+    )
 
 with st.form(key="qa_form"):
     query = st.text_area("Ask a question about the document")
@@ -54,7 +67,13 @@ if submit:
     # Output Columns
     answer_col, sources_col = st.columns(2)
 
-    answer, relevant_docs = get_answer(query, model="openai", index=index)
+    answer, relevant_docs = get_answer(
+        query,
+        model="openai",
+        index=index,
+        openai_api_key=openai_api_key,
+        temperature=0,
+    )
     if not show_all_chunks:
         # Get the sources for the answer
         sources = get_sources(answer, file)
