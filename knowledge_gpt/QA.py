@@ -14,7 +14,7 @@ from openai.error import AuthenticationError
 from pypdf import PdfReader
 
 from langchain.embeddings import OpenAIEmbeddings
-from knowledge_gpt.prompts import STUFF_PROMPT
+from knowledge_gpt.core.prompts import STUFF_PROMPT
 
 from hashlib import md5
 
