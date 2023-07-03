@@ -56,8 +56,6 @@ with st.expander("Advanced Options"):
     show_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
     show_full_doc = st.checkbox("Show parsed contents of the document")
 
-if not is_valid(index, query):
-    st.stop()
 
 if show_full_doc:
     with st.expander("Document"):
@@ -66,6 +64,9 @@ if show_full_doc:
 
 
 if submit:
+    if not is_valid(index, query):
+        st.stop()
+
     # Output Columns
     answer_col, sources_col = st.columns(2)
 
