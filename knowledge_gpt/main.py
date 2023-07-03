@@ -13,7 +13,10 @@ from knowledge_gpt.core.qa import get_answer, get_sources
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
 
+sidebar()
+
 openai_api_key = st.session_state.get("OPENAI_API_KEY")
+
 
 if not openai_api_key:
     st.warning(
@@ -21,7 +24,6 @@ if not openai_api_key:
         " https://platform.openai.com/account/api-keys."
     )
 
-sidebar()
 
 uploaded_file = st.file_uploader(
     "Upload a pdf, docx, or txt file",
