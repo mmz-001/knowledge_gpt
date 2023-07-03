@@ -9,12 +9,12 @@ from langchain.vectorstores import VectorStore
 
 
 def get_answer(
-    query: str, model: Literal["openai"], index: VectorStore
+    query: str, model: Literal["openai"], index: VectorStore, **kwargs: Any
 ) -> Tuple[Dict[str, Any], List[Document]]:
     """Gets an answer to a question from a file."""
 
     if model == "openai":
-        _model = ChatOpenAI(temperature=0)  # type: ignore
+        _model = ChatOpenAI(**kwargs)  # type: ignore
     else:
         raise NotImplementedError
 
