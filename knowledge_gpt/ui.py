@@ -1,9 +1,11 @@
 from typing import List
 import streamlit as st
+from langchain.docstore.document import Document
 
 
-def wrap_text_in_html(text: str | List[str]) -> str:
-    """Wraps each text block separated by newlines in <p> tags"""
+def wrap_doc_in_html(docs: List[Document]) -> str:
+    """Wraps each page in document separated by newlines in <p> tags"""
+    text = [doc.page_content for doc in docs]
     if isinstance(text, list):
         # Add horizontal rules between pages
         text = "\n<hr/>\n".join(text)
