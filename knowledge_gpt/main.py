@@ -4,10 +4,13 @@ from knowledge_gpt.components.sidebar import sidebar
 
 from knowledge_gpt.ui import wrap_doc_in_html, is_valid
 
-from knowledge_gpt.core.parsing import to_file
-from knowledge_gpt.core.chunking import chunk_file
-from knowledge_gpt.core.embedding import embed_docs
-from knowledge_gpt.core.qa import get_answer, get_sources
+from knowledge_gpt.core.cached import (
+    to_file,
+    embed_docs,
+    get_answer,
+    get_sources,
+    chunk_file,
+)
 
 
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
@@ -73,7 +76,8 @@ if submit:
     answer, relevant_docs = get_answer(
         query,
         model="openai",
-        index=index,
+        _index=index,
+        file=file,
         openai_api_key=openai_api_key,
         temperature=0,
     )

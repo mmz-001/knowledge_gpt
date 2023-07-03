@@ -9,9 +9,11 @@ from langchain.vectorstores import VectorStore
 
 
 def get_answer(
-    query: str, model: Literal["openai"], index: VectorStore, **kwargs: Any
+    query: str, model: Literal["openai"], _index: VectorStore, file: File, **kwargs: Any
 ) -> Tuple[Dict[str, Any], List[Document]]:
-    """Gets an answer to a question from a file."""
+    """Gets an answer to a question from a file.
+    Even though the file argument is not used, it is needed to cache the function.
+    """
 
     if model == "openai":
         _model = ChatOpenAI(**kwargs)  # type: ignore
@@ -25,7 +27,7 @@ def get_answer(
         prompt=STUFF_PROMPT,
     )
 
-    relevant_docs = index.similarity_search(query, k=5)
+    relevant_docs = _index.similarity_search(query, k=5)
 
     answer = chain(
         {"input_documents": relevant_docs, "question": query}, return_only_outputs=True

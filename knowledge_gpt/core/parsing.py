@@ -6,12 +6,14 @@ import docx2txt
 from langchain.docstore.document import Document
 from pypdf import PdfReader
 from pydantic import BaseModel
+from hashlib import md5
 
 
 class File(BaseModel):
     """Represents an uploaded file comprised of Documents"""
 
     name: str
+    id: str  # unique hash of the file
     metadata: dict[str, str | float | int] = {}
     docs: List[Document] = []
 
@@ -50,7 +52,9 @@ def parse_txt(file: BytesIO) -> str:
 def to_file(uploaded_file: BytesIO) -> File:
     """Parses an uploaded file and returns a File object with Documents"""
     docs = []
-    file = File(name=uploaded_file.name)
+    id = md5(uploaded_file.read()).hexdigest()
+    uploaded_file.seek(0)
+    file = File(name=uploaded_file.name, id=id)
 
     if uploaded_file.name.endswith(".pdf"):
         texts = parse_pdf(uploaded_file)
