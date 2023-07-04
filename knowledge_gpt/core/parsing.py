@@ -34,7 +34,7 @@ class DocxFile(File):
     @classmethod
     def from_bytes(cls, file: BytesIO) -> "DocxFile":
         text = docx2txt.process(file)
-        doc = Document(page_content=text)
+        doc = Document(page_content=text.strip())
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
 
@@ -45,7 +45,7 @@ class PdfFile(File):
         docs = []
         for i, page in enumerate(pdf.pages):
             text = page.extract_text()
-            doc = Document(page_content=text)
+            doc = Document(page_content=text.strip())
             doc.metadata["page"] = i + 1
             docs.append(doc)
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=docs)
@@ -56,7 +56,7 @@ class TxtFile(File):
     def from_bytes(cls, file: BytesIO) -> "TxtFile":
         text = file.read().decode("utf-8")
         file.seek(0)
-        doc = Document(page_content=text)
+        doc = Document(page_content=text.strip())
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
 
