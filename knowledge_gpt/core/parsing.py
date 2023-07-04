@@ -1,23 +1,28 @@
 from io import BytesIO
-from typing import List, Any
+from typing import List, Any, Optional
 
 import docx2txt
 from langchain.docstore.document import Document
 from pypdf import PdfReader
 from hashlib import md5
 
-from dataclasses import dataclass
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 
-@dataclass(frozen=True)
-class File:
+class File(ABC):
     """Represents an uploaded file comprised of Documents"""
 
-    name: str
-    id: str  # unique hash of the file
-    metadata: dict[str, Any] = {}
-    docs: List[Document] = []
+    def __init__(
+        self,
+        name: str,
+        id: str,
+        metadata: Optional[dict[str, Any]] = None,
+        docs: Optional[List[Document]] = None,
+    ):
+        self.name = name
+        self.id = id
+        self.metadata = metadata or {}
+        self.docs = docs or []
 
     @classmethod
     @abstractmethod
