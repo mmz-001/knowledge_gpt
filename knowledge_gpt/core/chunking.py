@@ -11,7 +11,7 @@ def chunk_file(file: File, chunk_size: int, chunk_overlap: int = 0) -> File:
     for doc in file.docs:
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
-            separators=["\n\n", "\n", ".", "!", "?", ",", " ", ""],
+            separators=["\n", ".", "!", "?", ",", " ", ""],
             chunk_overlap=chunk_overlap,
         )
 
