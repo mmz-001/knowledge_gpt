@@ -1,4 +1,3 @@
-import re
 from io import BytesIO
 from typing import List
 
@@ -20,8 +19,6 @@ class File(BaseModel):
 
 def parse_docx(file: BytesIO) -> str:
     text = docx2txt.process(file)
-    # Remove multiple newlines
-    text = re.sub(r"\n\s*\n", "\n\n", text)
     return text
 
 
@@ -30,13 +27,6 @@ def parse_pdf(file: BytesIO) -> List[str]:
     output = []
     for page in pdf.pages:
         text = page.extract_text()
-        # Merge hyphenated words
-        text = re.sub(r"(\w+)-\n(\w+)", r"\1\2", text)
-        # Fix newlines in the middle of sentences
-        text = re.sub(r"(?<!\n\s)\n(?!\s\n)", " ", text.strip())
-        # Remove multiple newlines
-        text = re.sub(r"\n\s*\n", "\n\n", text)
-
         output.append(text)
 
     return output
@@ -44,8 +34,6 @@ def parse_pdf(file: BytesIO) -> List[str]:
 
 def parse_txt(file: BytesIO) -> str:
     text = file.read().decode("utf-8")
-    # Remove multiple newlines
-    text = re.sub(r"\n\s*\n", "\n\n", text)
     return text
 
 
