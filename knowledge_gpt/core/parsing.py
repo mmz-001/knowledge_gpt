@@ -1,5 +1,6 @@
 from io import BytesIO
 from typing import List, Any, Optional
+import re
 
 import docx2txt
 from langchain.docstore.document import Document
@@ -30,10 +31,18 @@ class File(ABC):
         """Creates a File from a BytesIO object"""
 
 
+def strip_consecutive_newlines(text: str) -> str:
+    """Strips consecutive newlines from a string
+    possibly with whitespace in between
+    """
+    return re.sub(r"\s*\n\s*", "\n", text)
+
+
 class DocxFile(File):
     @classmethod
     def from_bytes(cls, file: BytesIO) -> "DocxFile":
         text = docx2txt.process(file)
+        text = strip_consecutive_newlines(text)
         doc = Document(page_content=text.strip())
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
@@ -45,6 +54,7 @@ class PdfFile(File):
         docs = []
         for i, page in enumerate(pdf.pages):
             text = page.extract_text()
+            text = strip_consecutive_newlines(text)
             doc = Document(page_content=text.strip())
             doc.metadata["page"] = i + 1
             docs.append(doc)
@@ -55,6 +65,7 @@ class TxtFile(File):
     @classmethod
     def from_bytes(cls, file: BytesIO) -> "TxtFile":
         text = file.read().decode("utf-8")
+        text = strip_consecutive_newlines(text)
         file.seek(0)
         doc = Document(page_content=text.strip())
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
