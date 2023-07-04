@@ -1,65 +1,67 @@
 from io import BytesIO
-from typing import List
+from typing import List, Any
 
 import docx2txt
 from langchain.docstore.document import Document
 from pypdf import PdfReader
-from pydantic import BaseModel
 from hashlib import md5
 
+from dataclasses import dataclass
+from abc import abstractmethod
 
-class File(BaseModel):
+
+@dataclass(frozen=True)
+class File:
     """Represents an uploaded file comprised of Documents"""
 
     name: str
     id: str  # unique hash of the file
-    metadata: dict[str, str | float | int] = {}
+    metadata: dict[str, Any] = {}
     docs: List[Document] = []
 
-
-def parse_docx(file: BytesIO) -> str:
-    text = docx2txt.process(file)
-    return text
-
-
-def parse_pdf(file: BytesIO) -> List[str]:
-    pdf = PdfReader(file)
-    output = []
-    for page in pdf.pages:
-        text = page.extract_text()
-        output.append(text)
-
-    return output
+    @classmethod
+    @abstractmethod
+    def from_bytes(cls, file: BytesIO) -> "File":
+        """Creates a File from a BytesIO object"""
 
 
-def parse_txt(file: BytesIO) -> str:
-    text = file.read().decode("utf-8")
-    return text
+class DocxFile(File):
+    @classmethod
+    def from_bytes(cls, file: BytesIO) -> "DocxFile":
+        text = docx2txt.process(file)
+        doc = Document(page_content=text)
+        return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
 
-def to_file(uploaded_file: BytesIO) -> File:
-    """Parses an uploaded file and returns a File object with Documents"""
-    docs = []
-    id = md5(uploaded_file.read()).hexdigest()
-    uploaded_file.seek(0)
-    file = File(name=uploaded_file.name, id=id)
-
-    if uploaded_file.name.endswith(".pdf"):
-        texts = parse_pdf(uploaded_file)
-        for i, text in enumerate(texts):
+class PdfFile(File):
+    @classmethod
+    def from_bytes(cls, file: BytesIO) -> "PdfFile":
+        pdf = PdfReader(file)
+        docs = []
+        for i, page in enumerate(pdf.pages):
+            text = page.extract_text()
             doc = Document(page_content=text)
             doc.metadata["page"] = i + 1
             docs.append(doc)
+        return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=docs)
 
-    elif uploaded_file.name.endswith(".docx"):
-        # No page numbers for docx
-        text = parse_docx(uploaded_file)
-        docs = [Document(page_content=text)]
 
-    elif uploaded_file.name.endswith(".txt"):
-        # No page numbers for txt
-        text = parse_txt(uploaded_file)
-        docs = [Document(page_content=text)]
+class TxtFile(File):
+    @classmethod
+    def from_bytes(cls, file: BytesIO) -> "TxtFile":
+        text = file.read().decode("utf-8")
+        file.seek(0)
+        doc = Document(page_content=text)
+        return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
-    file.docs = docs
-    return file
+
+def read_file(file: BytesIO) -> File:
+    """Reads an uploaded file and returns a File object"""
+    if file.name.endswith(".docx"):
+        return DocxFile.from_bytes(file)
+    elif file.name.endswith(".pdf"):
+        return PdfFile.from_bytes(file)
+    elif file.name.endswith(".txt"):
+        return TxtFile.from_bytes(file)
+    else:
+        raise NotImplementedError
