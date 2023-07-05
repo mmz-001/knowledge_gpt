@@ -3,6 +3,9 @@ import streamlit as st
 from langchain.docstore.document import Document
 from knowledge_gpt.core.parsing import File
 import openai
+from streamlit.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def wrap_doc_in_html(docs: List[Document]) -> str:
@@ -27,6 +30,7 @@ def is_file_valid(file: File) -> bool:
             "Cannot read document! Make sure the document has"
             " selectable text or is not password protected."
         )
+        logger.error("Cannot read document")
         return False
     return True
 
@@ -44,5 +48,6 @@ def is_open_ai_key_valid(openai_api_key) -> bool:
         )
     except Exception as e:
         st.error(f"{e.__class__.__name__}: {e}")
+        logger.error(f"{e.__class__.__name__}: {e}")
         return False
     return True
