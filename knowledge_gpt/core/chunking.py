@@ -33,5 +33,6 @@ def chunk_file(
             )
             chunked_docs.append(doc)
 
-    file.docs = chunked_docs
-    return file
+    chunked_file = file.copy()
+    chunked_file.docs = chunked_docs
+    return chunked_file
