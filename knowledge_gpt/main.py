@@ -40,7 +40,7 @@ if not uploaded_file:
 
 
 file = read_file(uploaded_file)
-chunked_file = chunk_file(file, chunk_size=800, chunk_overlap=0)
+chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
 
 
 with st.spinner("Indexing document... This may take a while⏳"):
