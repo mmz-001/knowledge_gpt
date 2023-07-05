@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, List
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from knowledge_gpt.core.prompts import STUFF_PROMPT
 from langchain.docstore.document import Document
@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 
 class AnswerWithSources(BaseModel):
-    answer: Dict[str, Any]
+    answer: str
     sources: List[Document]
 
 
