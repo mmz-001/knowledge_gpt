@@ -11,6 +11,8 @@ from knowledge_gpt.core.parsing import (
 from pathlib import Path
 
 TESTS_ROOT = Path(__file__).parent.resolve()
+UNIT_TESTS_ROOT = Path(__file__).parent.resolve()
+TESTS_ROOT = UNIT_TESTS_ROOT.parent.resolve()
 PROJECT_ROOT = TESTS_ROOT.parent.resolve()
 RESOURCE_ROOT = PROJECT_ROOT / "resources"
 SAMPLE_ROOT = RESOURCE_ROOT / "samples"
