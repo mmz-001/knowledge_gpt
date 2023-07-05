@@ -2,7 +2,12 @@ import streamlit as st
 
 from knowledge_gpt.components.sidebar import sidebar
 
-from knowledge_gpt.ui import wrap_doc_in_html, is_valid
+from knowledge_gpt.ui import (
+    wrap_doc_in_html,
+    is_query_valid,
+    is_file_valid,
+    is_open_ai_key_valid,
+)
 
 from knowledge_gpt.core.caching import bootstrap_caching
 
@@ -42,8 +47,10 @@ if not uploaded_file:
 file = read_file(uploaded_file)
 chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
 
-if not openai_api_key:
-    st.error("Please enter your OpenAI API key in the sidebar!")
+if not is_file_valid(file):
+    st.stop()
+
+if not is_open_ai_key_valid(openai_api_key):
     st.stop()
 
 
@@ -72,7 +79,7 @@ if show_full_doc:
 
 
 if submit:
-    if not is_valid(folder_index, query):
+    if not is_query_valid(query):
         st.stop()
 
     # Output Columns
