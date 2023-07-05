@@ -35,7 +35,7 @@ def is_file_valid(file: File) -> bool:
     return True
 
 
-@st.cache_data()
+@st.cache_data(show_spinner=False)
 def is_open_ai_key_valid(openai_api_key) -> bool:
     if not openai_api_key:
         st.error("Please enter your OpenAI API key in the sidebar!")
