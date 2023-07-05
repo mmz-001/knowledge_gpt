@@ -1,5 +1,5 @@
 from knowledge_gpt.core.embedding import FolderIndex
-from .core.fake_file import FakeFile
+from .fake_file import FakeFile
 from langchain.docstore.document import Document
 from knowledge_gpt.core.parsing import File
 from typing import List
