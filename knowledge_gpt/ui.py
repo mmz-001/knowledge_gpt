@@ -13,9 +13,6 @@ def wrap_doc_in_html(docs: List[Document]) -> str:
 
 
 def is_valid(index, query):
-    if not st.session_state.get("OPENAI_API_KEY"):
-        st.error("Please configure your OpenAI API key!")
-        return False
     if not index:
         st.error("Please upload a document!")
         return False

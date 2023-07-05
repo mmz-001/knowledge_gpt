@@ -42,6 +42,10 @@ if not uploaded_file:
 file = read_file(uploaded_file)
 chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
 
+if not openai_api_key:
+    st.error("Please enter your OpenAI API key in the sidebar!")
+    st.stop()
+
 
 with st.spinner("Indexing document... This may take a while⏳"):
     folder_index = embed_files(
