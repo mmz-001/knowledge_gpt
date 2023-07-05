@@ -3,11 +3,8 @@ from knowledge_gpt.core.parsing import File
 from langchain.vectorstores.faiss import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
-from langchain.vectorstores.base import VectorStore
-from typing import List, TypeVar, Type
+from typing import List, Type
 from langchain.docstore.document import Document
-
-VST = TypeVar("VST", bound="VectorStore")
 
 
 class FolderIndex:
@@ -33,7 +30,7 @@ class FolderIndex:
 
     @classmethod
     def from_files(
-        cls, files: List[File], embeddings: Embeddings, vector_store: Type[VST]
+        cls, files: List[File], embeddings: Embeddings, vector_store: Type[VectorStore]
     ) -> "FolderIndex":
         """Creates an index from files."""
 
