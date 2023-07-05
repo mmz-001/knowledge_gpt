@@ -2,6 +2,7 @@ from typing import List
 import streamlit as st
 from langchain.docstore.document import Document
 from knowledge_gpt.core.parsing import File
+import openai
 
 
 def wrap_doc_in_html(docs: List[Document]) -> str:
@@ -30,8 +31,18 @@ def is_file_valid(file: File) -> bool:
     return True
 
 
+@st.cache_data()
 def is_open_ai_key_valid(openai_api_key) -> bool:
     if not openai_api_key:
         st.error("Please enter your OpenAI API key in the sidebar!")
+        return False
+    try:
+        openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": "test"}],
+            api_key=openai_api_key,
+        )
+    except Exception as e:
+        st.error(f"{e.__class__.__name__}: {e}")
         return False
     return True
