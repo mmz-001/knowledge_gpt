@@ -8,6 +8,7 @@ from pypdf import PdfReader
 from hashlib import md5
 
 from abc import abstractmethod, ABC
+from copy import deepcopy
 
 
 class File(ABC):
@@ -29,6 +30,24 @@ class File(ABC):
     @abstractmethod
     def from_bytes(cls, file: BytesIO) -> "File":
         """Creates a File from a BytesIO object"""
+
+    def __repr__(self) -> str:
+        return (
+            f"File(name={self.name}, id={self.id},"
+            " metadata={self.metadata}, docs={self.docs})"
+        )
+
+    def __str__(self) -> str:
+        return f"File(name={self.name}, id={self.id}, metadata={self.metadata})"
+
+    def copy(self) -> "File":
+        """Create a deep copy of this File"""
+        return self.__class__(
+            name=self.name,
+            id=self.id,
+            metadata=deepcopy(self.metadata),
+            docs=deepcopy(self.docs),
+        )
 
 
 def strip_consecutive_newlines(text: str) -> str:

@@ -10,7 +10,10 @@ from knowledge_gpt.core.parsing import (
 )
 from pathlib import Path
 
-TESTS_ROOT = Path(__file__).parent.resolve()
+from .fake_file import FakeFile
+from langchain.docstore.document import Document
+
+
 UNIT_TESTS_ROOT = Path(__file__).parent.resolve()
 TESTS_ROOT = UNIT_TESTS_ROOT.parent.resolve()
 PROJECT_ROOT = TESTS_ROOT.parent.resolve()
@@ -100,6 +103,37 @@ def test_read_file_not_implemented():
     file.name = "test.unknown"
     with pytest.raises(NotImplementedError):
         read_file(file)
+
+
+def test_file_copy():
+    # Create a Document and FakeFile instance
+    document = Document(page_content="test content", metadata={"page": "1"})
+    file = FakeFile("test_file", "1234", {"author": "test"}, [document])
+
+    # Create a copy of the file
+    file_copy = file.copy()
+
+    # Check that the original and copy are distinct objects
+    assert file is not file_copy
+
+    # Check that the copy has the same attributes as the original
+    assert file.name == file_copy.name
+    assert file.id == file_copy.id
+
+    # Check the mutable attributes were deeply copied
+    assert file.metadata == file_copy.metadata
+    assert file.metadata is not file_copy.metadata
+
+    # Check the documents were deeply copied
+    assert file.docs == file_copy.docs
+    assert file.docs is not file_copy.docs
+
+    # Check individual documents are not the same objects
+    assert file.docs[0] is not file_copy.docs[0]
+
+    # Check the documents have the same attributes
+    assert file.docs[0].page_content == file_copy.docs[0].page_content
+    assert file.docs[0].metadata == file_copy.docs[0].metadata
 
 
 def test_strip_consecutive_newlines():
