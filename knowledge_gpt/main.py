@@ -4,17 +4,18 @@ from knowledge_gpt.components.sidebar import sidebar
 
 from knowledge_gpt.ui import wrap_doc_in_html, is_valid
 
-from knowledge_gpt.core.cached import (
-    to_file,
-    embed_docs,
-    get_answer,
-    get_sources,
-    chunk_file,
-)
+from knowledge_gpt.core.caching import bootstrap_caching
 
+from knowledge_gpt.core.parsing import read_file
+from knowledge_gpt.core.chunking import chunk_file
+from knowledge_gpt.core.embedding import embed_files
+from knowledge_gpt.core.qa import query_folder
 
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
+
+# Enable caching for expensive functions
+bootstrap_caching()
 
 sidebar()
 
@@ -38,14 +39,14 @@ if not uploaded_file:
     st.stop()
 
 
-file = to_file(uploaded_file)
-file = chunk_file(file, chunk_size=800, chunk_overlap=0)
+file = read_file(uploaded_file)
+chunked_file = chunk_file(file, chunk_size=800, chunk_overlap=0)
 
 
 with st.spinner("Indexing document... This may take a while⏳"):
-    index = embed_docs(
-        file=file,
-        embeddings="openai",
+    folder_index = embed_files(
+        files=[chunked_file],
+        embedding="openai",
         vector_store="faiss",
         openai_api_key=openai_api_key,
     )
@@ -56,7 +57,7 @@ with st.form(key="qa_form"):
 
 
 with st.expander("Advanced Options"):
-    show_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
+    return_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
     show_full_doc = st.checkbox("Show parsed contents of the document")
 
 
@@ -67,33 +68,27 @@ if show_full_doc:
 
 
 if submit:
-    if not is_valid(index, query):
+    if not is_valid(folder_index, query):
         st.stop()
 
     # Output Columns
     answer_col, sources_col = st.columns(2)
 
-    answer, relevant_docs = get_answer(
-        query,
-        model="openai",
-        _index=index,
-        file=file,
+    result = query_folder(
+        folder_index=folder_index,
+        query=query,
+        return_all=return_all_chunks,
         openai_api_key=openai_api_key,
         temperature=0,
     )
-    if not show_all_chunks:
-        # Get the sources for the answer
-        sources = get_sources(answer, file)
-    else:
-        sources = relevant_docs
 
     with answer_col:
         st.markdown("#### Answer")
-        st.markdown(answer["output_text"].split("SOURCES: ")[0])
+        st.markdown(result.answer)
 
     with sources_col:
         st.markdown("#### Sources")
-        for source in sources:
+        for source in result.sources:
             st.markdown(source.page_content)
             st.markdown(source.metadata["source"])
             st.markdown("---")
