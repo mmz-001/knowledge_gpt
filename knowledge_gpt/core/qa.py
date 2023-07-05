@@ -43,7 +43,9 @@ def query_folder(
     if not return_all:
         sources = get_sources(result["output_text"], folder_index)
 
-    return AnswerWithSources(answer=result, sources=sources)
+    answer = result["output_text"].split("SOURCES: ")[0]
+
+    return AnswerWithSources(answer=answer, sources=sources)
 
 
 def get_sources(answer: str, folder_index: FolderIndex) -> List[Document]:
