@@ -2,7 +2,7 @@ import pytest
 from langchain.docstore.document import Document
 
 from knowledge_gpt.core.chunking import chunk_file
-from tests.fake_file import FakeFile
+from .fake_file import FakeFile
 
 
 @pytest.fixture
