@@ -4,6 +4,7 @@ from langchain.docstore.document import Document
 from knowledge_gpt.core.parsing import File
 import openai
 from streamlit.logger import get_logger
+from typing import NoReturn
 
 logger = get_logger(__name__)
 
@@ -26,13 +27,16 @@ def is_query_valid(query: str) -> bool:
 
 def is_file_valid(file: File) -> bool:
     if len(file.docs) == 0 or len(file.docs[0].page_content.strip()) == 0:
-        st.error(
-            "Cannot read document! Make sure the document has"
-            " selectable text or is not password protected."
-        )
+        st.error("Cannot read document! Make sure the document has selectable text")
         logger.error("Cannot read document")
         return False
     return True
+
+
+def display_file_read_error(e: Exception) -> NoReturn:
+    st.error("Error reading file. Make sure the file is not corrupted or encrypted")
+    logger.error(f"{e.__class__.__name__}: {e}")
+    st.stop()
 
 
 @st.cache_data(show_spinner=False)

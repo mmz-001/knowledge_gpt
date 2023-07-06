@@ -7,6 +7,7 @@ from knowledge_gpt.ui import (
     is_query_valid,
     is_file_valid,
     is_open_ai_key_valid,
+    display_file_read_error,
 )
 
 from knowledge_gpt.core.caching import bootstrap_caching
@@ -43,8 +44,11 @@ uploaded_file = st.file_uploader(
 if not uploaded_file:
     st.stop()
 
+try:
+    file = read_file(uploaded_file)
+except Exception as e:
+    display_file_read_error(e)
 
-file = read_file(uploaded_file)
 chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
 
 if not is_file_valid(file):
