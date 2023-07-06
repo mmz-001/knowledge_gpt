@@ -19,6 +19,7 @@ pillow = "^9.4.0"
 pypdf = "^3.3.0"
 tenacity = "^8.2.0"
 tiktoken = "^0.4.0"
+pycryptodome = "^3.18.0"
 
 
 [tool.poetry.group.dev.dependencies]
