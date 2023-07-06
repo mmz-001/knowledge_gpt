@@ -1,5 +1,5 @@
 # Local data
-data/local_data/
+resources/local_data/
 
 # Prototyping notebooks
 notebooks/
