@@ -6,7 +6,7 @@ from typing import List
 from .fake_file import FakeFile
 from knowledge_gpt.core.parsing import File
 
-from .fake_vector_store import FakeVectorStore
+from knowledge_gpt.core.debug import FakeVectorStore
 
 
 def test_getting_sources_from_answer():
