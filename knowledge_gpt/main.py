@@ -17,6 +17,13 @@ from knowledge_gpt.core.chunking import chunk_file
 from knowledge_gpt.core.embedding import embed_files
 from knowledge_gpt.core.qa import query_folder
 
+EMBEDDING = "openai"
+VECTOR_STORE = "faiss"
+MODEL = "openai"
+
+# For testing
+# EMBEDDING, VECTOR_STORE, MODEL = ["debug"] * 3
+
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
 
@@ -61,8 +68,8 @@ if not is_open_ai_key_valid(openai_api_key):
 with st.spinner("Indexing document... This may take a while⏳"):
     folder_index = embed_files(
         files=[chunked_file],
-        embedding="openai",
-        vector_store="faiss",
+        embedding=EMBEDDING,
+        vector_store=VECTOR_STORE,
         openai_api_key=openai_api_key,
     )
 
@@ -93,6 +100,7 @@ if submit:
         folder_index=folder_index,
         query=query,
         return_all=return_all_chunks,
+        model=MODEL,
         openai_api_key=openai_api_key,
         temperature=0,
     )
