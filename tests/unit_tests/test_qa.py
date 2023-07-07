@@ -29,7 +29,7 @@ def test_getting_sources_from_answer():
             ],
         ),
     ]
-    folder_index = FolderIndex(files=files, index=FakeVectorStore())
+    folder_index = FolderIndex(files=files, index=FakeVectorStore(texts=[]))
 
     answer = "This is the answer. SOURCES: 1, 2, 3, 4"
 
