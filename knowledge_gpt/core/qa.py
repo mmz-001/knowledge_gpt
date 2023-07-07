@@ -4,6 +4,7 @@ from knowledge_gpt.core.prompts import STUFF_PROMPT
 from langchain.docstore.document import Document
 from langchain.chat_models import ChatOpenAI
 from knowledge_gpt.core.embedding import FolderIndex
+from knowledge_gpt.core.debug import FakeChatModel
 from pydantic import BaseModel
 
 
@@ -13,7 +14,11 @@ class AnswerWithSources(BaseModel):
 
 
 def query_folder(
-    query: str, folder_index: FolderIndex, return_all: bool = False, **model_kwargs: Any
+    query: str,
+    folder_index: FolderIndex,
+    return_all: bool = False,
+    model: str = "openai",
+    **model_kwargs: Any,
 ) -> AnswerWithSources:
     """Queries a folder index for an answer.
 
@@ -22,14 +27,24 @@ def query_folder(
         folder_index (FolderIndex): The folder index to search.
         return_all (bool): Whether to return all the documents from the embedding or
         just the sources for the answer.
+        model (str): The model to use for the answer generation.
         **model_kwargs (Any): Keyword arguments for the model.
 
     Returns:
         AnswerWithSources: The answer and the source documents.
     """
+    supported_models = {
+        "openai": ChatOpenAI,
+        "debug": FakeChatModel,
+    }
+
+    if model in supported_models:
+        llm = supported_models[model](**model_kwargs)
+    else:
+        raise ValueError(f"Model {model} not supported.")
 
     chain = load_qa_with_sources_chain(
-        llm=ChatOpenAI(**model_kwargs),
+        llm=llm,
         chain_type="stuff",
         prompt=STUFF_PROMPT,
     )

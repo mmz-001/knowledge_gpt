@@ -5,6 +5,7 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.embeddings.base import Embeddings
 from typing import List, Type
 from langchain.docstore.document import Document
+from knowledge_gpt.core.debug import FakeVectorStore, FakeEmbeddings
 
 
 class FolderIndex:
@@ -51,9 +52,11 @@ def embed_files(
 
     supported_embeddings: dict[str, Type[Embeddings]] = {
         "openai": OpenAIEmbeddings,
+        "debug": FakeEmbeddings,
     }
     supported_vector_stores: dict[str, Type[VectorStore]] = {
         "faiss": FAISS,
+        "debug": FakeVectorStore,
     }
 
     if embedding in supported_embeddings:
