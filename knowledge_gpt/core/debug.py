@@ -3,7 +3,14 @@ from typing import Iterable, List, Any
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.embeddings.fake import FakeEmbeddings as FakeEmbeddingsBase
+from langchain.chat_models.fake import FakeListChatModel
 from typing import Optional
+
+
+class FakeChatModel(FakeListChatModel):
+    def __init__(self, **kwargs):
+        responses = ["The answer is 42. SOURCES: 1, 2, 3, 4"]
+        super().__init__(responses=responses, **kwargs)
 
 
 class FakeEmbeddings(FakeEmbeddingsBase):
@@ -37,6 +44,6 @@ class FakeVectorStore(VectorStore):
         self, query: str, k: int = 4, **kwargs: Any
     ) -> List[Document]:
         return [
-            Document(page_content=text, metadata={"source": f"{text}"})
-            for text in self.texts[:k]
+            Document(page_content=text, metadata={"source": f"{i+1}-{1}"})
+            for i, text in enumerate(self.texts)
         ]
