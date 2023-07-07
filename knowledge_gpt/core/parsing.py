@@ -92,11 +92,11 @@ class TxtFile(File):
 
 def read_file(file: BytesIO) -> File:
     """Reads an uploaded file and returns a File object"""
-    if file.name.endswith(".docx"):
+    if file.name.lower().endswith(".docx"):
         return DocxFile.from_bytes(file)
-    elif file.name.endswith(".pdf"):
+    elif file.name.lower().endswith(".pdf"):
         return PdfFile.from_bytes(file)
-    elif file.name.endswith(".txt"):
+    elif file.name.lower().endswith(".txt"):
         return TxtFile.from_bytes(file)
     else:
-        raise NotImplementedError
+        raise NotImplementedError(f"File type {file.name.split('.')[-1]} not supported")
