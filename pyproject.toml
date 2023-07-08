@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "knowledge-gpt"
-version = "0.0.3"
+version = "0.0.4"
 description = "Accurate answers and instant citations for your documents"
 authors = ["mmz-001 <70096033+mmz-001@users.noreply.github.com>"]
 license = "MIT"
