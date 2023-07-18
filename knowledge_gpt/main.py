@@ -1,4 +1,6 @@
 import streamlit as st
+from trubrics.integrations.streamlit import FeedbackCollector
+
 
 from knowledge_gpt.components.sidebar import sidebar
 
@@ -27,12 +29,17 @@ MODEL = "openai"
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
 
+if "submit" not in st.session_state:
+    st.session_state["submit"] = False
+
 # Enable caching for expensive functions
 bootstrap_caching()
 
 sidebar()
 
 openai_api_key = st.session_state.get("OPENAI_API_KEY")
+email = st.secrets.get("TRUBRICS_EMAIL")
+password = st.secrets.get("TRUBRICS_PASSWORD")
 
 
 if not openai_api_key:
@@ -77,6 +84,9 @@ with st.form(key="qa_form"):
     query = st.text_area("Ask a question about the document")
     submit = st.form_submit_button("Submit")
 
+    if submit:
+        st.session_state["submit"] = True
+
 
 with st.expander("Advanced Options"):
     return_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
@@ -89,13 +99,12 @@ if show_full_doc:
         st.markdown(f"<p>{wrap_doc_in_html(file.docs)}</p>", unsafe_allow_html=True)
 
 
-if submit:
+if st.session_state["submit"]:
     if not is_query_valid(query):
         st.stop()
 
     # Output Columns
     answer_col, sources_col = st.columns(2)
-
     result = query_folder(
         folder_index=folder_index,
         query=query,
@@ -109,9 +118,33 @@ if submit:
         st.markdown("#### Answer")
         st.markdown(result.answer)
 
+        collector = FeedbackCollector(
+            component_name="default",
+            email=email,
+            password=password,
+        )
+
+        feedback_result = collector.st_feedback(
+            feedback_type="thumbs",
+            model=MODEL,
+            open_feedback_label="[Optional] Provide additional feedback",
+            key="key_result",
+            metadata={"response": result.answer, "prompt": query},
+            tags=["answer"],
+        )
+
     with sources_col:
         st.markdown("#### Sources")
         for source in result.sources:
             st.markdown(source.page_content)
             st.markdown(source.metadata["source"])
             st.markdown("---")
+
+        feedback_source = collector.st_feedback(
+            feedback_type="thumbs",
+            model=MODEL,
+            open_feedback_label="[Optional] Provide additional feedback",
+            key="key_source",
+            metadata={"response": source.metadata["source"], "prompt": query},
+            tags=["source"],
+        )
