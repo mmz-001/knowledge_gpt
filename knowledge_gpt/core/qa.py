@@ -1,11 +1,13 @@
 from typing import Any, List
-from langchain.chains.qa_with_sources import load_qa_with_sources_chain
-from knowledge_gpt.core.prompts import STUFF_PROMPT
+
+# from langchain.chains.qa_with_sources import load_qa_with_sources_chain
+# from knowledge_gpt.core.prompts import STUFF_PROMPT
 from langchain.docstore.document import Document
 from langchain.chat_models import ChatOpenAI
 from knowledge_gpt.core.embedding import FolderIndex
 from knowledge_gpt.core.debug import FakeChatModel
 from pydantic import BaseModel
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 
 class AnswerWithSources(BaseModel):
@@ -15,6 +17,7 @@ class AnswerWithSources(BaseModel):
 
 def query_folder(
     query: str,
+    instructions: str,
     folder_index: FolderIndex,
     return_all: bool = False,
     model: str = "openai",
@@ -39,28 +42,19 @@ def query_folder(
     }
 
     if model in supported_models:
-        llm = supported_models[model](**model_kwargs)
+        llm = supported_models[model](model="gpt-3.5-turbo-16k-0613", **model_kwargs)
     else:
         raise ValueError(f"Model {model} not supported.")
 
-    chain = load_qa_with_sources_chain(
-        llm=llm,
-        chain_type="stuff",
-        prompt=STUFF_PROMPT,
-    )
+    messages = [
+        SystemMessage(content="# Instructions\n\n" + instructions),
+        AIMessage(content="# Context\n\n" + folder_index.files[0].docs[0].page_content),
+        HumanMessage(content="# Question\n\n" + query),
+    ]
 
-    relevant_docs = folder_index.index.similarity_search(query, k=5)
-    result = chain(
-        {"input_documents": relevant_docs, "question": query}, return_only_outputs=True
-    )
-    sources = relevant_docs
+    result = llm.predict_messages(messages)
 
-    if not return_all:
-        sources = get_sources(result["output_text"], folder_index)
-
-    answer = result["output_text"].split("SOURCES: ")[0]
-
-    return AnswerWithSources(answer=answer, sources=sources)
+    return AnswerWithSources(answer=result.content, sources=[])
 
 
 def get_sources(answer: str, folder_index: FolderIndex) -> List[Document]:

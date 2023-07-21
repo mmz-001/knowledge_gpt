@@ -13,7 +13,8 @@ from knowledge_gpt.ui import (
 from knowledge_gpt.core.caching import bootstrap_caching
 
 from knowledge_gpt.core.parsing import read_file
-from knowledge_gpt.core.chunking import chunk_file
+
+# from knowledge_gpt.core.chunking import chunk_file
 from knowledge_gpt.core.embedding import embed_files
 from knowledge_gpt.core.qa import query_folder
 
@@ -22,7 +23,7 @@ VECTOR_STORE = "faiss"
 MODEL = "openai"
 
 # For testing
-# EMBEDDING, VECTOR_STORE, MODEL = ["debug"] * 3
+EMBEDDING, VECTOR_STORE, _ = ["debug"] * 3
 
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
@@ -56,7 +57,8 @@ try:
 except Exception as e:
     display_file_read_error(e)
 
-chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
+# chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
+file.docs[0].metadata["source"] = "all"
 
 if not is_file_valid(file):
     st.stop()
@@ -67,19 +69,24 @@ if not is_open_ai_key_valid(openai_api_key):
 
 with st.spinner("Indexing document... This may take a while⏳"):
     folder_index = embed_files(
-        files=[chunked_file],
+        files=[file],
         embedding=EMBEDDING,
         vector_store=VECTOR_STORE,
         openai_api_key=openai_api_key,
     )
 
+
 with st.form(key="qa_form"):
+    rules = st.text_area(
+        "Custom instructions. "
+        "The document will be added after this and before the question",
+        height=300,
+    )
     query = st.text_area("Ask a question about the document")
     submit = st.form_submit_button("Submit")
 
 
 with st.expander("Advanced Options"):
-    return_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
     show_full_doc = st.checkbox("Show parsed contents of the document")
 
 
@@ -93,25 +100,15 @@ if submit:
     if not is_query_valid(query):
         st.stop()
 
-    # Output Columns
-    answer_col, sources_col = st.columns(2)
-
     result = query_folder(
         folder_index=folder_index,
         query=query,
-        return_all=return_all_chunks,
+        instructions=rules,
+        return_all=False,
         model=MODEL,
         openai_api_key=openai_api_key,
         temperature=0,
     )
 
-    with answer_col:
-        st.markdown("#### Answer")
-        st.markdown(result.answer)
-
-    with sources_col:
-        st.markdown("#### Sources")
-        for source in result.sources:
-            st.markdown(source.page_content)
-            st.markdown(source.metadata["source"])
-            st.markdown("---")
+    st.markdown("#### Answer")
+    st.markdown(result.answer)
