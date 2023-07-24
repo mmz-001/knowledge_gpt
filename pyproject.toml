@@ -18,6 +18,7 @@ docx2txt = "^0.8"
 pillow = "^9.4.0"
 tenacity = "^8.2.0"
 tiktoken = "^0.4.0"
+trubrics = "^1.4.3"
 pycryptodome = "^3.18.0"
 pymupdf = "^1.22.5"
 
