@@ -63,6 +63,7 @@ class DocxFile(File):
         text = docx2txt.process(file)
         text = strip_consecutive_newlines(text)
         doc = Document(page_content=text.strip())
+        doc.metadata["source"] = "p-1"
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
 
@@ -76,6 +77,7 @@ class PdfFile(File):
             text = strip_consecutive_newlines(text)
             doc = Document(page_content=text.strip())
             doc.metadata["page"] = i + 1
+            doc.metadata["source"] = f"p-{i+1}"
             docs.append(doc)
         # file.read() mutates the file object, which can affect caching
         # so we need to reset the file pointer to the beginning
@@ -90,6 +92,7 @@ class TxtFile(File):
         text = strip_consecutive_newlines(text)
         file.seek(0)
         doc = Document(page_content=text.strip())
+        doc.metadata["source"] = "p-1"
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
 
