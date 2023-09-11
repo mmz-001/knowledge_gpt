@@ -8,7 +8,7 @@ def chunk_file(
 ) -> File:
     """Chunks each document in a file into smaller documents
     according to the specified chunk size and overlap
-    where the size is determined by the number of token for the specified model.
+    where the size is determined by the number of tokens for the specified model.
     """
 
     # split each document into chunks
