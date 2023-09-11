@@ -22,7 +22,7 @@ VECTOR_STORE = "faiss"
 MODEL = "openai"
 
 # For testing
-# EMBEDDING, VECTOR_STORE, MODEL = ["debug"] * 3
+EMBEDDING, VECTOR_STORE, MODEL = ["debug"] * 3
 
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
@@ -61,7 +61,7 @@ chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
 if not is_file_valid(file):
     st.stop()
 
-if not is_open_ai_key_valid(openai_api_key):
+if MODEL != "debug" and not is_open_ai_key_valid(openai_api_key):
     st.stop()
 
 
