@@ -6,7 +6,8 @@ from langchain.docstore.document import Document
 def pop_docs_upto_limit(
     query: str, chain: StuffDocumentsChain, docs: List[Document], max_len: int
 ) -> List[Document]:
-    """Pops documents from a list until the final prompt length is less than the max length."""
+    """Pops documents from a list until the final prompt length is less
+    than the max length."""
 
     token_count: int = chain.prompt_length(docs, question=query)  # type: ignore
 
