@@ -1,11 +1,10 @@
-from typing import Any, List
+from typing import List
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from knowledge_gpt.core.prompts import STUFF_PROMPT
 from langchain.docstore.document import Document
-from langchain.chat_models import ChatOpenAI
 from knowledge_gpt.core.embedding import FolderIndex
-from knowledge_gpt.core.debug import FakeChatModel
 from pydantic import BaseModel
+from langchain.chat_models.base import BaseChatModel
 
 
 class AnswerWithSources(BaseModel):
@@ -16,9 +15,8 @@ class AnswerWithSources(BaseModel):
 def query_folder(
     query: str,
     folder_index: FolderIndex,
+    llm: BaseChatModel,
     return_all: bool = False,
-    model: str = "openai",
-    **model_kwargs: Any,
 ) -> AnswerWithSources:
     """Queries a folder index for an answer.
 
@@ -33,15 +31,6 @@ def query_folder(
     Returns:
         AnswerWithSources: The answer and the source documents.
     """
-    supported_models = {
-        "openai": ChatOpenAI,
-        "debug": FakeChatModel,
-    }
-
-    if model in supported_models:
-        llm = supported_models[model](**model_kwargs)
-    else:
-        raise ValueError(f"Model {model} not supported.")
 
     chain = load_qa_with_sources_chain(
         llm=llm,
@@ -73,5 +62,4 @@ def get_sources(answer: str, folder_index: FolderIndex) -> List[Document]:
         for doc in file.docs:
             if doc.metadata["source"] in source_keys:
                 source_docs.append(doc)
-
     return source_docs

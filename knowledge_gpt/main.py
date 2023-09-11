@@ -16,13 +16,15 @@ from knowledge_gpt.core.parsing import read_file
 from knowledge_gpt.core.chunking import chunk_file
 from knowledge_gpt.core.embedding import embed_files
 from knowledge_gpt.core.qa import query_folder
+from knowledge_gpt.core.utils import get_llm
+
 
 EMBEDDING = "openai"
 VECTOR_STORE = "faiss"
-MODEL = "openai"
+MODEL_LIST = ["gpt-3.5-turbo", "gpt-4"]
 
-# For testing
-EMBEDDING, VECTOR_STORE, MODEL = ["debug"] * 3
+# Uncomment to enable debug mode
+# MODEL_LIST.insert(0, "debug")
 
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
 st.header("📖KnowledgeGPT")
@@ -48,6 +50,13 @@ uploaded_file = st.file_uploader(
     help="Scanned documents are not supported yet!",
 )
 
+model: str = st.selectbox("Model", options=MODEL_LIST)  # type: ignore
+
+with st.expander("Advanced Options"):
+    return_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
+    show_full_doc = st.checkbox("Show parsed contents of the document")
+
+
 if not uploaded_file:
     st.stop()
 
@@ -61,26 +70,22 @@ chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
 if not is_file_valid(file):
     st.stop()
 
-if MODEL != "debug" and not is_open_ai_key_valid(openai_api_key):
+
+if not is_open_ai_key_valid(openai_api_key, model):
     st.stop()
 
 
 with st.spinner("Indexing document... This may take a while⏳"):
     folder_index = embed_files(
         files=[chunked_file],
-        embedding=EMBEDDING,
-        vector_store=VECTOR_STORE,
+        embedding=EMBEDDING if model != "debug" else "debug",
+        vector_store=VECTOR_STORE if model != "debug" else "debug",
         openai_api_key=openai_api_key,
     )
 
 with st.form(key="qa_form"):
     query = st.text_area("Ask a question about the document")
     submit = st.form_submit_button("Submit")
-
-
-with st.expander("Advanced Options"):
-    return_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
-    show_full_doc = st.checkbox("Show parsed contents of the document")
 
 
 if show_full_doc:
@@ -96,13 +101,12 @@ if submit:
     # Output Columns
     answer_col, sources_col = st.columns(2)
 
+    llm = get_llm(model=model, openai_api_key=openai_api_key, temperature=0)
     result = query_folder(
         folder_index=folder_index,
         query=query,
         return_all=return_all_chunks,
-        model=MODEL,
-        openai_api_key=openai_api_key,
-        temperature=0,
+        llm=llm,
     )
 
     with answer_col:
