@@ -21,10 +21,10 @@ tiktoken = "^0.4.0"
 pycryptodome = "^3.18.0"
 pymupdf = "^1.22.5"
 transformers = "^4.33.1"
+python-dotenv = "^0.21.1"
 
 
 [tool.poetry.group.dev.dependencies]
-python-dotenv = "^0.21.1"
 pytest = "^7.2.1"
 ipykernel = "^6.23.3"
 ipywidgets = "^8.0.6"
