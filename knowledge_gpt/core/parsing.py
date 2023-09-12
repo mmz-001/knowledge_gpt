@@ -34,7 +34,7 @@ class File(ABC):
     def __repr__(self) -> str:
         return (
             f"File(name={self.name}, id={self.id},"
-            " metadata={self.metadata}, docs={self.docs})"
+            f" metadata={self.metadata}, docs={self.docs})"
         )
 
     def __str__(self) -> str:
