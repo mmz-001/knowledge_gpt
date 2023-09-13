@@ -29,4 +29,4 @@ def get_llm(model: str, **kwargs) -> BaseChatModel:
     if "gpt" in model:
         return ChatOpenAI(model=model, **kwargs)  # type: ignore
 
-    raise ValueError(f"Model {model} not supported!")
+    raise NotImplementedError(f"Model {model} not supported!")
