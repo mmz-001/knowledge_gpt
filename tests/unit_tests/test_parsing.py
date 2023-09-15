@@ -5,6 +5,7 @@ from knowledge_gpt.core.parsing import (
     DocxFile,
     PdfFile,
     TxtFile,
+    ImgFile,
     read_file,
     strip_consecutive_newlines,
 )
@@ -83,6 +84,15 @@ def test_txt_file():
     assert len(txt_file.docs) == 1
     assert txt_file.docs[0].page_content == "Hello World"
 
+def test_img_file():
+    with open(SAMPLE_ROOT / "test_hello.jpeg", "rb") as f:
+        file = BytesIO(f.read())
+        file.name = "test_hello.jpeg"
+        img_file = ImgFile.from_bytes(file)
+
+    assert img_file.name == "test_hello.jpeg"
+    assert len(img_file.docs) == 1
+    assert img_file.docs[0].page_content.lower() == "Hello World".lower()
 
 def test_read_file():
     # Test the `read_file` function with each file type
