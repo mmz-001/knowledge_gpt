@@ -45,8 +45,8 @@ if not openai_api_key:
 
 
 uploaded_file = st.file_uploader(
-    "Upload a pdf, docx, or txt file",
-    type=["pdf", "docx", "txt"],
+    "Upload a pdf, docx, txt, png, tiff, jpg, or jpeg file",
+    type=["pdf", "docx", "txt", "png", "tiff", "jpg", "jpeg"],
     help="Scanned documents are not supported yet!",
 )
 
