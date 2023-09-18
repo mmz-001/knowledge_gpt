@@ -88,7 +88,7 @@ class PdfFile(File):
 class TxtFile(File):
     @classmethod
     def from_bytes(cls, file: BytesIO) -> "TxtFile":
-        text = file.read().decode("utf-8")
+        text = file.read().decode("utf-8", errors="replace")
         text = strip_consecutive_newlines(text)
         file.seek(0)
         doc = Document(page_content=text.strip())

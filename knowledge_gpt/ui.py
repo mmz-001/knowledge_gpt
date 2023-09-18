@@ -36,9 +36,9 @@ def is_file_valid(file: File) -> bool:
     return True
 
 
-def display_file_read_error(e: Exception) -> NoReturn:
+def display_file_read_error(e: Exception, file_name: str) -> NoReturn:
     st.error("Error reading file. Make sure the file is not corrupted or encrypted")
-    logger.error(f"{e.__class__.__name__}: {e}")
+    logger.error(f"{e.__class__.__name__}: {e}. Extension: {file_name.split('.')[-1]}")
     st.stop()
 
 

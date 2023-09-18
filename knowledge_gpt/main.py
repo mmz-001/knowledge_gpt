@@ -63,7 +63,7 @@ if not uploaded_file:
 try:
     file = read_file(uploaded_file)
 except Exception as e:
-    display_file_read_error(e)
+    display_file_read_error(e, file_name=uploaded_file.name)
 
 chunked_file = chunk_file(file, chunk_size=300, chunk_overlap=0)
 
