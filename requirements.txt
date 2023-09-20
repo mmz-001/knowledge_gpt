@@ -82,4 +82,5 @@ validators==0.20.0 ; python_version >= "3.10" and python_version < "4.0"
 watchdog==3.0.0 ; python_version >= "3.10" and python_version < "4.0" and platform_system != "Darwin"
 yarl==1.9.2 ; python_version >= "3.10" and python_version < "4.0"
 zipp==3.16.2 ; python_version >= "3.10" and python_version < "4.0"
+streamlit
 -e ./
