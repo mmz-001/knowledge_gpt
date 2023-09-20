@@ -26,8 +26,8 @@ MODEL_LIST = ["gpt-3.5-turbo", "gpt-4"]
 # Uncomment to enable debug mode
 # MODEL_LIST.insert(0, "debug")
 
-st.set_page_config(page_title="Berend-Botje DocGPT", page_icon="📖", layout="wide")
-st.header("📖Berend-Botje DocGPT")
+st.set_page_config(page_title="Berend-Botje - De lesplanner", page_icon="📖", layout="wide")
+st.header("📖Berend-Botje - De Lesplanner")
 
 # Enable caching for expensive functions
 bootstrap_caching()
@@ -75,7 +75,7 @@ if not is_open_ai_key_valid(openai_api_key, model):
     st.stop()
 
 
-with st.spinner("Indexing document... This may take a while⏳"):
+with st.spinner("Indexeren van het document... Dit kan even duren⏳"):
     folder_index = embed_files(
         files=[chunked_file],
         embedding=EMBEDDING if model != "debug" else "debug",
@@ -84,7 +84,7 @@ with st.spinner("Indexing document... This may take a while⏳"):
     )
 
 with st.form(key="qa_form"):
-    query = st.text_area("Stel een vraag over het document")
+    query = st.text_area("Stel hier je vraag.")
     submit = st.form_submit_button("Verstuur")
 
 
@@ -110,11 +110,11 @@ if submit:
     )
 
     with answer_col:
-        st.markdown("#### Answer")
+        st.markdown("#### Lesplan")
         st.markdown(result.answer)
 
     with sources_col:
-        st.markdown("#### Sources")
+        st.markdown("#### Gebruikte bronnen")
         for source in result.sources:
             st.markdown(source.page_content)
             st.markdown(source.metadata["source"])
