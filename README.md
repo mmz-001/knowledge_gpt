@@ -6,7 +6,7 @@
 Waarom moeilijk doen ....?
 </div>
 
-**Maak lesplannen op basis van de toegevoegde documenten. **
+** Maak lesplannen op basis van de toegevoegde documenten. **
 
 
 [Demo](https://berend-bot-knowledgegpt.streamlit.app/)
