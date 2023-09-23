@@ -26,8 +26,8 @@ MODEL_LIST = ["gpt-3.5-turbo", "gpt-4"]
 # Uncomment to enable debug mode
 # MODEL_LIST.insert(0, "debug")
 
-st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
-st.header("📖KnowledgeGPT")
+st.set_page_config(page_title="Berend-Botje DocGPT", page_icon="📖", layout="wide")
+st.header("📖Berend-Botje DocGPT")
 
 # Enable caching for expensive functions
 bootstrap_caching()
@@ -45,9 +45,9 @@ if not openai_api_key:
 
 
 uploaded_file = st.file_uploader(
-    "Upload a pdf, docx, or txt file",
+    "Upload een pdf, docx, or txt file",
     type=["pdf", "docx", "txt"],
-    help="Scanned documents are not supported yet!",
+    help="Gescande documenten worden nog niet ondersteund!",
 )
 
 model: str = st.selectbox("Model", options=MODEL_LIST)  # type: ignore
@@ -84,8 +84,8 @@ with st.spinner("Indexing document... This may take a while⏳"):
     )
 
 with st.form(key="qa_form"):
-    query = st.text_area("Ask a question about the document")
-    submit = st.form_submit_button("Submit")
+    query = st.text_area("Stel een vraag over het document")
+    submit = st.form_submit_button("Verstuur")
 
 
 if show_full_doc:
