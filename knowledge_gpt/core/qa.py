@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from langchain.chat_models.base import BaseChatModel
 import openai
 
-API_KEY = "API KEY"
+API_KEY = "API-KEY"
 
 
 class AnswerWithSources(BaseModel):

@@ -65,18 +65,18 @@ with st.spinner("Indexing document... This may take a while⏳"):
     )
 
     # Output Columns
-    resume_info_col, career_path_col, suggestion_col, salary_col = st.columns(4)
+    resume_info_tabs, career_path_tabs, suggestion_tabs, salary_tabs, road_map_tabs = st.tabs(["Resume Information", "Career Path", "Suggestion Knowledge", "Salary", "Road Map"])
 
     llm = get_llm(model=model, openai_api_key=openai_api_key, temperature=0)
 
-    resume_info_query = "What is the Job Title, Year of Experiences, Skills, Working Experiences, Education of the resume content below ?"
+    resume_info_query = "What is the Job Title, Year of Experiences, Skills, Working Experiences, Education of the resume content below?"
     resume_info_result = query_folder(
         folder_index=folder_index,
         query=resume_info_query,
         llm=llm,
     )
 
-    job_title_query = "What is the job title of the resume content below ?"
+    job_title_query = "What is the job title of the resume content below ? Please return me the job title and nothing else"
     job_title_result = query_folder(
         folder_index=folder_index,
         query=job_title_query,
@@ -93,27 +93,37 @@ with st.spinner("Indexing document... This may take a while⏳"):
         query=suggestion_query,
     )
 
-    salary_query = "What is the Salary range of {} in VietNam?".format(job_title_result.answer)
+    salary_query = "What is the Salary range of {} in VietNam? Please return me the salary and nothing else".format(job_title_result.answer)
     salary_result = request(
         query=salary_query,
     )
 
-    with resume_info_col:
-        st.markdown("#### Resume Info")
-        st.markdown(resume_info_result.answer)
+    road_map_query = "Can you draw career roadmap of {} by directory structure format in mark down?".format(job_title_result.answer)
+    road_map_result = request(
+        query=road_map_query,
+    )
+
+    with resume_info_tabs:
+        resume_info_tabs.subheader("Resume Information")
+        resume_info_tabs.markdown(resume_info_result.answer)
 
 
-    with career_path_col:
-        st.markdown("#### Career Path")
-        st.markdown(career_path_result)
 
-    with suggestion_col:
-        st.markdown("#### Suggestion")
-        st.markdown(suggestion_result)
+    with career_path_tabs:
+        career_path_tabs.subheader("Career Path")
+        career_path_tabs.write(career_path_result)
 
-    with salary_col:
-        st.markdown("#### Salary")
-        st.markdown(salary_result)
+    with suggestion_tabs:
+        suggestion_tabs.subheader("Suggestion Knowledge")
+        suggestion_tabs.write(suggestion_result)
+
+    with salary_tabs:
+        salary_tabs.subheader("Salary")
+        salary_tabs.write(salary_result)
+
+    with road_map_tabs:
+        road_map_tabs.subheader("Road Map")
+        road_map_tabs.write(road_map_result)
     # with sources_col:
     #     st.markdown("#### Sources")
     #     for source in result.sources:
