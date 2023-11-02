@@ -15,33 +15,23 @@ from knowledge_gpt.core.caching import bootstrap_caching
 from knowledge_gpt.core.parsing import read_file
 from knowledge_gpt.core.chunking import chunk_file
 from knowledge_gpt.core.embedding import embed_files
-from knowledge_gpt.core.qa import query_folder
+from knowledge_gpt.core.qa import query_folder, query, request
 from knowledge_gpt.core.utils import get_llm
 
 
 EMBEDDING = "openai"
 VECTOR_STORE = "faiss"
-MODEL_LIST = ["gpt-3.5-turbo", "gpt-4"]
 
 # Uncomment to enable debug mode
 # MODEL_LIST.insert(0, "debug")
 
 st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
-st.header("📖KnowledgeGPT")
+st.header("📖CareerNavi")
 
 # Enable caching for expensive functions
 bootstrap_caching()
 
-sidebar()
-
 openai_api_key = st.session_state.get("OPENAI_API_KEY")
-
-
-if not openai_api_key:
-    st.warning(
-        "Enter your OpenAI API key in the sidebar. You can get a key at"
-        " https://platform.openai.com/account/api-keys."
-    )
 
 
 uploaded_file = st.file_uploader(
@@ -50,12 +40,7 @@ uploaded_file = st.file_uploader(
     help="Scanned documents are not supported yet!",
 )
 
-model: str = st.selectbox("Model", options=MODEL_LIST)  # type: ignore
-
-with st.expander("Advanced Options"):
-    return_all_chunks = st.checkbox("Show all chunks retrieved from vector search")
-    show_full_doc = st.checkbox("Show parsed contents of the document")
-
+model: str = "gpt-3.5-turbo"  # type: ignore
 
 if not uploaded_file:
     st.stop()
@@ -71,10 +56,6 @@ if not is_file_valid(file):
     st.stop()
 
 
-if not is_open_ai_key_valid(openai_api_key, model):
-    st.stop()
-
-
 with st.spinner("Indexing document... This may take a while⏳"):
     folder_index = embed_files(
         files=[chunked_file],
@@ -83,39 +64,59 @@ with st.spinner("Indexing document... This may take a while⏳"):
         openai_api_key=openai_api_key,
     )
 
-with st.form(key="qa_form"):
-    query = st.text_area("Ask a question about the document")
-    submit = st.form_submit_button("Submit")
-
-
-if show_full_doc:
-    with st.expander("Document"):
-        # Hack to get around st.markdown rendering LaTeX
-        st.markdown(f"<p>{wrap_doc_in_html(file.docs)}</p>", unsafe_allow_html=True)
-
-
-if submit:
-    if not is_query_valid(query):
-        st.stop()
-
     # Output Columns
-    answer_col, sources_col = st.columns(2)
+    resume_info_col, career_path_col, suggestion_col, salary_col = st.columns(4)
 
     llm = get_llm(model=model, openai_api_key=openai_api_key, temperature=0)
-    result = query_folder(
+
+    resume_info_query = "What is the Job Title, Year of Experiences, Skills, Working Experiences, Education of the resume content below ?"
+    resume_info_result = query_folder(
         folder_index=folder_index,
-        query=query,
-        return_all=return_all_chunks,
+        query=resume_info_query,
         llm=llm,
     )
 
-    with answer_col:
-        st.markdown("#### Answer")
-        st.markdown(result.answer)
+    job_title_query = "What is the job title of the resume content below ?"
+    job_title_result = query_folder(
+        folder_index=folder_index,
+        query=job_title_query,
+        llm=llm,
+    )
 
-    with sources_col:
-        st.markdown("#### Sources")
-        for source in result.sources:
-            st.markdown(source.page_content)
-            st.markdown(source.metadata["source"])
-            st.markdown("---")
+    career_path_query = "what is career pathway of {}?".format(job_title_result.answer)
+    career_path_result = request(
+        query=career_path_query,
+    )
+
+    suggestion_query = "Tell me skill sets of {}".format(job_title_result.answer)
+    suggestion_result = request(
+        query=suggestion_query,
+    )
+
+    salary_query = "What is the Salary range of {} in VietNam?".format(job_title_result.answer)
+    salary_result = request(
+        query=salary_query,
+    )
+
+    with resume_info_col:
+        st.markdown("#### Resume Info")
+        st.markdown(resume_info_result.answer)
+
+
+    with career_path_col:
+        st.markdown("#### Career Path")
+        st.markdown(career_path_result)
+
+    with suggestion_col:
+        st.markdown("#### Suggestion")
+        st.markdown(suggestion_result)
+
+    with salary_col:
+        st.markdown("#### Salary")
+        st.markdown(salary_result)
+    # with sources_col:
+    #     st.markdown("#### Sources")
+    #     for source in result.sources:
+    #         st.markdown(source.page_content)
+    #         st.markdown(source.metadata["source"])
+    #         st.markdown("---")

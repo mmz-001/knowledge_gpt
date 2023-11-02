@@ -5,6 +5,9 @@ from langchain.docstore.document import Document
 from knowledge_gpt.core.embedding import FolderIndex
 from pydantic import BaseModel
 from langchain.chat_models.base import BaseChatModel
+import openai
+
+API_KEY = "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"
 
 
 class AnswerWithSources(BaseModel):
@@ -52,6 +55,39 @@ def query_folder(
     return AnswerWithSources(answer=answer, sources=sources)
 
 
+
+def query(
+        query: str,
+        llm: BaseChatModel,
+) -> AnswerWithSources:
+    """Queries a folder index for an answer.
+
+    Args:
+        query (str): The query to search for.
+        folder_index (FolderIndex): The folder index to search.
+        return_all (bool): Whether to return all the documents from the embedding or
+        just the sources for the answer.
+        model (str): The model to use for the answer generation.
+        **model_kwargs (Any): Keyword arguments for the model.
+
+    Returns:
+        AnswerWithSources: The answer and the source documents.
+    """
+
+    chain = load_qa_with_sources_chain(
+        llm=llm,
+        chain_type="stuff",
+        prompt=STUFF_PROMPT,
+    )
+
+    result = chain(
+        {"question": query}, return_only_outputs=True
+    )
+
+    answer = result["output_text"].split("SOURCES: ")[0]
+
+    return AnswerWithSources(answer=answer)
+
 def get_sources(answer: str, folder_index: FolderIndex) -> List[Document]:
     """Retrieves the docs that were used to answer the question the generated answer."""
 
@@ -63,3 +99,20 @@ def get_sources(answer: str, folder_index: FolderIndex) -> List[Document]:
             if doc.metadata["source"] in source_keys:
                 source_docs.append(doc)
     return source_docs
+
+
+def request(query):
+    openai.api_key = API_KEY
+
+    messages = [{"role": "user", "content": query}]
+    response = openai.ChatCompletion.create(
+
+        model="gpt-3.5-turbo",
+
+        messages=messages,
+
+        temperature=0,
+
+    )
+
+    return response.choices[0].message["content"]
