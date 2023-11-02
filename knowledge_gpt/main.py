@@ -17,6 +17,7 @@ from knowledge_gpt.core.chunking import chunk_file
 from knowledge_gpt.core.embedding import embed_files
 from knowledge_gpt.core.qa import query_folder, query, request
 from knowledge_gpt.core.utils import get_llm
+from PIL import Image
 
 
 EMBEDDING = "openai"
@@ -25,8 +26,15 @@ VECTOR_STORE = "faiss"
 # Uncomment to enable debug mode
 # MODEL_LIST.insert(0, "debug")
 
-st.set_page_config(page_title="KnowledgeGPT", page_icon="📖", layout="wide")
-st.header("📖CareerNavi")
+
+image = Image.open('Team Logo.png')
+
+
+st.set_page_config(page_title="CareerNavi - Navigating your career path", page_icon="📖", layout="wide")
+st.image(image)
+st.header("CareerNavi")
+
+st.subheader("Navigating your career path - An online generative AI platform could understand, track and navigate career planning.")
 
 # Enable caching for expensive functions
 bootstrap_caching()
@@ -64,16 +72,16 @@ with st.spinner("Indexing document... This may take a while⏳"):
         openai_api_key=openai_api_key,
     )
 
-    # Output Columns
-    resume_info_tabs, career_path_tabs, suggestion_tabs, salary_tabs, road_map_tabs = st.tabs(["Resume Information", "Career Path", "Suggestion Knowledge", "Salary", "Road Map"])
 
     llm = get_llm(model=model, openai_api_key=openai_api_key, temperature=0)
+    content = ""
+    for doc in file.docs:
+        content += "\n" + doc.page_content
 
-    resume_info_query = "What is the Job Title, Year of Experiences, Skills, Working Experiences, Education of the resume content below?"
-    resume_info_result = query_folder(
-        folder_index=folder_index,
+    resume_info_query = "What is the Job Title, Year of Experiences, Skills in proficient, Working Experiences, Education, Job Level of the resume content below ?"
+    resume_info_query = resume_info_query + "\n" + content
+    resume_info_result = request(
         query=resume_info_query,
-        llm=llm,
     )
 
     job_title_query = "What is the job title of the resume content below ? Please return me the job title and nothing else"
@@ -103,9 +111,24 @@ with st.spinner("Indexing document... This may take a while⏳"):
         query=road_map_query,
     )
 
+    next_level_query = "what is next level of {}. Please return me the next level and nothing else?".format(job_title_result.answer)
+    next_level_result = request(
+        query=next_level_query,
+    )
+
+    st.subheader('The next level')
+    st.markdown(next_level_result)
+
+    st.subheader('Salary')
+    st.markdown(salary_result)
+
+    # Output Columns
+    resume_info_tabs, career_path_tabs, suggestion_tabs, road_map_tabs = st.tabs(["Resume Information", "Career Path", "Knowledge Suggestion", "Knowledge and Skills"])
+
+
     with resume_info_tabs:
         resume_info_tabs.subheader("Resume Information")
-        resume_info_tabs.markdown(resume_info_result.answer)
+        resume_info_tabs.markdown(resume_info_result.replace("\n", "<br/>"), unsafe_allow_html=True)
 
 
 
@@ -116,10 +139,6 @@ with st.spinner("Indexing document... This may take a while⏳"):
     with suggestion_tabs:
         suggestion_tabs.subheader("Suggestion Knowledge")
         suggestion_tabs.write(suggestion_result)
-
-    with salary_tabs:
-        salary_tabs.subheader("Salary")
-        salary_tabs.write(salary_result)
 
     with road_map_tabs:
         road_map_tabs.subheader("Road Map")
