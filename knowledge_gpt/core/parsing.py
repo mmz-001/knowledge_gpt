@@ -95,14 +95,25 @@ class TxtFile(File):
         doc.metadata["source"] = "p-1"
         return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
 
+class MdFile(File):
+    @classmethod
+    def from_bytes(cls, file: BytesIO) -> "MdFile":
+        text = file.read().decode("utf-8", errors="replace")
+        text = strip_consecutive_newlines(text)
+        file.seek(0)
+        doc = Document(page_content=text.strip())
+        doc.metadata["source"] = "p-1"
+        return cls(name=file.name, id=md5(file.read()).hexdigest(), docs=[doc])
+
 
 def read_file(file: BytesIO) -> File:
     """Reads an uploaded file and returns a File object"""
     if file.name.lower().endswith(".docx"):
         return DocxFile.from_bytes(file)
-    elif file.name.lower().endswith(".pdf"):
+    if file.name.lower().endswith(".md"):
+        return MdFile.from_bytes(file)
+    if file.name.lower().endswith(".pdf"):
         return PdfFile.from_bytes(file)
-    elif file.name.lower().endswith(".txt"):
+    if file.name.lower().endswith(".txt"):
         return TxtFile.from_bytes(file)
-    else:
-        raise NotImplementedError(f"File type {file.name.split('.')[-1]} not supported")
+    raise NotImplementedError(f"File type {file.name.split('.')[-1]} not supported")
